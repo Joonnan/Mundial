@@ -1,0 +1,66 @@
+<!-- src/app/app-shell.component.html -->
+<div class="shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">🏆</span>
+      <div>
+        <p class="brand-title">PORRA</p>
+        <p class="brand-sub">MUNDIAL 2026</p>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/partidos"     routerLinkActive="active" class="nav-btn">
+        <span>⚽</span> Partidos
+      </a>
+      <a routerLink="/clasificacion" routerLinkActive="active" class="nav-btn">
+        <span>🏆</span> Clasificación
+      </a>
+      <a routerLink="/perfil"       routerLinkActive="active" class="nav-btn">
+        <span>👤</span> Mi Perfil
+      </a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="active" class="nav-btn nav-admin">
+          <span>🛠️</span> Admin
+        </a>
+      }
+    </div>
+
+    <div class="user-box">
+      <div class="user-avatar">{{ inicial() }}</div>
+      <div class="user-info">
+        <p class="user-name">{{ auth.usuario()?.display_name || auth.usuario()?.username }}</p>
+        <p class="user-pts">⭐ {{ auth.usuario()?.puntos_total }} pts</p>
+        @if (auth.isAdmin()) {
+          <span class="admin-badge">Admin</span>
+        }
+      </div>
+      <button class="signout-btn" (click)="auth.signOut()" title="Cerrar sesión">⏏</button>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+    <!-- Mobile header -->
+    <div class="mobile-header">
+      <span class="mobile-brand">🏆 Porra 2026</span>
+      <button class="menu-btn" (click)="menuOpen = !menuOpen">☰</button>
+    </div>
+
+    @if (menuOpen) {
+      <div class="mobile-nav">
+        <a routerLink="/partidos"     (click)="menuOpen=false" class="mobile-nav-btn">⚽ Partidos</a>
+        <a routerLink="/clasificacion"(click)="menuOpen=false" class="mobile-nav-btn">🏆 Clasificación</a>
+        <a routerLink="/perfil"       (click)="menuOpen=false" class="mobile-nav-btn">👤 Mi Perfil</a>
+        @if (auth.isAdmin()) {
+          <a routerLink="/admin" (click)="menuOpen=false" class="mobile-nav-btn">🛠️ Admin</a>
+        }
+        <button class="mobile-nav-btn" (click)="auth.signOut()">⏏ Salir</button>
+      </div>
+    }
+
+    <router-outlet />
+  </main>
+</div>

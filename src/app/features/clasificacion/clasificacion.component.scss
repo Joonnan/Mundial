@@ -1,0 +1,204 @@
+// src/app/features/clasificacion/clasificacion.component.scss
+
+// ── Mi posición banner ──────────────────────────────────────
+.mi-posicion-banner {
+  background: linear-gradient(135deg, var(--verde) 0%, var(--verde-claro) 100%);
+  border-radius: var(--radio-lg);
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(10,61,31,.25);
+}
+
+.mi-pos-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .mi-pos-num   { font-size: 36px; }
+  .mi-pos-label { color: rgba(255,255,255,.75); font-size: 12px; margin: 0; font-weight: 600; }
+  .mi-pos-pts   { color: #fff; font-size: 16px; font-weight: 800; margin: 4px 0 0; }
+}
+
+.mi-pos-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stat-mini {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+// ── Podio ───────────────────────────────────────────────────
+.podio-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 2.5rem;
+  padding: 0 1rem;
+}
+
+.podio-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 130px;
+}
+
+.podio-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--verde);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  border: 3px solid transparent;
+  transition: transform .2s;
+
+  &.es-mio {
+    border-color: var(--oro);
+    box-shadow: 0 0 0 3px rgba(200,162,39,.3);
+  }
+}
+
+.podio-1 .podio-avatar { width: 68px; height: 68px; font-size: 26px; }
+
+.podio-nombre {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  text-align: center;
+  margin: 0 0 2px;
+}
+
+.podio-pts {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--verde);
+  margin: 0 0 8px;
+}
+
+.podio-1 .podio-pts { font-size: 20px; }
+
+.podio-bloque {
+  width: 100%;
+  background: var(--verde);
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
+
+  .podio-2 & { background: #4b7a5a; }
+  .podio-3 & { background: #6b9a78; }
+}
+
+.podio-2 .podio-bloque { background: #4b7a5a; }
+.podio-3 .podio-bloque { background: #6b9a78; }
+
+.podio-medalla { font-size: 26px; }
+
+// ── Tabla ───────────────────────────────────────────────────
+.table-wrap { margin-bottom: 1.5rem; }
+
+.row-mio { background: #f0fdf4 !important; }
+
+.pos-cell {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.jugador-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.av-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+
+  &.av-mio { background: var(--verde); color: #fff; }
+}
+
+.jugador-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .jugador-nombre { font-size: 14px; font-weight: 700; color: #111; }
+  .jugador-user   { font-size: 11px; color: #9ca3af; }
+}
+
+.tu-badge {
+  background: var(--verde);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pts-total {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--verde);
+}
+
+.center { text-align: center; }
+
+// ── Leyenda ─────────────────────────────────────────────────
+.leyenda {
+  background: #fff;
+  border-radius: var(--radio-lg);
+  padding: 1.25rem 1.5rem;
+  border: 1.5px solid var(--gris-borde);
+  margin-top: 1.5rem;
+
+  .leyenda-title {
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+}
+
+.leyenda-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .hide-sm { display: none; }
+  .podio-wrap { gap: 10px; }
+  .mi-posicion-banner { flex-direction: column; align-items: flex-start; }
+}

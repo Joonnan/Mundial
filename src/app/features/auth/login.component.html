@@ -1,0 +1,52 @@
+<!-- src/app/features/auth/login.component.html -->
+<div class="page">
+  <div class="card">
+
+    <!-- Logo -->
+    <div class="logo">
+      <span class="trophy">🏆</span>
+      <div>
+        <p class="logo-title">PORRA</p>
+        <p class="logo-sub">MUNDIAL 2026</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" [class.active]="mode === 'login'" (click)="setMode('login')">Entrar</button>
+      <button class="tab" [class.active]="mode === 'register'" (click)="setMode('register')">Registrarse</button>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form-wrap">
+      @if (mode === 'register') {
+        <div class="field">
+          <label>Nombre de usuario</label>
+          <input type="text" formControlName="username" placeholder="crack2026" />
+          @if (form.get('username')?.touched && form.get('username')?.invalid) {
+            <span class="field-error">Mínimo 3 caracteres</span>
+          }
+        </div>
+      }
+      <div class="field">
+        <label>Email</label>
+        <input type="email" formControlName="email" placeholder="tu@email.com" />
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+      </div>
+
+      @if (error) {
+        <div class="alert alert-error">{{ error }}</div>
+      }
+      @if (success) {
+        <div class="alert alert-success">{{ success }}</div>
+      }
+
+      <button type="submit" class="btn-submit" [disabled]="loading">
+        {{ loading ? 'Cargando...' : mode === 'login' ? '⚽ Entrar' : '🎉 Crear cuenta' }}
+      </button>
+    </form>
+  </div>
+</div>

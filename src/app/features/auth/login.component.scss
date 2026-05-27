@@ -1,0 +1,102 @@
+// src/app/features/auth/login.component.scss
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a3d1f 0%, #1a6b35 50%, #0a3d1f 100%);
+  padding: 1rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 25px 60px rgba(0,0,0,.35);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 2rem;
+
+  .trophy { font-size: 48px; }
+  .logo-title { font-size: 28px; font-weight: 900; color: #0a3d1f; margin: 0; letter-spacing: 3px; font-family: 'Georgia', serif; }
+  .logo-sub   { font-size: 12px; color: #c8a227; margin: 0; font-weight: 700; letter-spacing: 5px; }
+}
+
+.tabs {
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #0a3d1f;
+  margin-bottom: 1.75rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #0a3d1f;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all .2s;
+
+  &.active { background: #0a3d1f; color: #fff; }
+}
+
+.form-wrap { display: flex; flex-direction: column; gap: 18px; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label { font-size: 13px; font-weight: 600; color: #444; }
+
+  input {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #ddd;
+    font-size: 15px;
+    outline: none;
+    transition: border .2s;
+    font-family: inherit;
+    &:focus { border-color: #0a3d1f; }
+  }
+}
+
+.field-error { font-size: 12px; color: #dc2626; }
+
+.alert {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+
+  &.alert-error   { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; }
+  &.alert-success { background: #f0fdf4; border: 1px solid #86efac; color: #16a34a; }
+}
+
+.btn-submit {
+  background: #0a3d1f;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s;
+  font-family: inherit;
+  margin-top: 4px;
+
+  &:disabled { opacity: .6; cursor: not-allowed; }
+  &:hover:not(:disabled) { opacity: .9; }
+}

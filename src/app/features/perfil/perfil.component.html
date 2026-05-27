@@ -1,0 +1,132 @@
+<!-- src/app/features/perfil/perfil.component.html -->
+<div class="page-wrap">
+  <h1 class="section-title">👤 Mi Perfil</h1>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div><span>Cargando perfil...</span></div>
+  }
+
+  @if (!loading()) {
+    <div class="perfil-layout">
+
+      <!-- Columna izquierda: datos del usuario -->
+      <aside class="perfil-aside">
+
+        <!-- Avatar y nombre -->
+        <div class="card avatar-card">
+          <div class="big-avatar">{{ inicial() }}</div>
+
+          @if (!editNombre()) {
+            <h2 class="display-name">{{ auth.usuario()?.display_name || auth.usuario()?.username }}</h2>
+            <p class="username-text">@{{ auth.usuario()?.username }}</p>
+            <button class="btn btn-ghost btn-sm mt-8" (click)="iniciarEditNombre()">✏️ Editar nombre</button>
+          } @else {
+            <div class="edit-nombre-form">
+              <input class="input-base"
+                     type="text"
+                     placeholder="Tu nombre"
+                     [(ngModel)]="draftNombre"
+                     maxlength="40" />
+              <div class="edit-nombre-btns">
+                <button class="btn btn-primary btn-sm" (click)="guardarNombre()" [disabled]="savingNombre()">
+                  {{ savingNombre() ? '...' : '💾 Guardar' }}
+                </button>
+                <button class="btn btn-ghost btn-sm" (click)="cancelarEditNombre()">Cancelar</button>
+              </div>
+              @if (msgNombre()) {
+                <p class="nombre-msg" [class.ok]="msgNombre()!.ok">{{ msgNombre()!.text }}</p>
+              }
+            </div>
+          }
+
+          @if (auth.isAdmin()) {
+            <span class="admin-tag">🛠️ Administrador</span>
+          }
+
+          <div class="pts-display">
+            <span class="pts-big">{{ auth.usuario()?.puntos_total }}</span>
+            <span class="pts-label">puntos totales</span>
+          </div>
+        </div>
+
+        <!-- Stats rápidas -->
+        <div class="card stats-card">
+          <h3 class="card-title">Mis estadísticas</h3>
+          <div class="stats-rows">
+            <div class="stat-row">
+              <span class="stat-key">Apuestas realizadas</span>
+              <span class="stat-val">{{ stats().total }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-key">Partidos resueltos</span>
+              <span class="stat-val">{{ stats().jugados }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-key">Pendientes</span>
+              <span class="stat-val text-gold">{{ stats().pendientes }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-key">Precisión</span>
+              <span class="stat-val text-green">{{ stats().precision }}%</span>
+            </div>
+          </div>
+
+          <!-- Desglose de puntos -->
+          <div class="puntos-desglose">
+            <div class="pts-row"><span class="pts-chip pts-5">🎯 Exactos</span><strong>{{ stats().exactos }}</strong></div>
+            <div class="pts-row"><span class="pts-chip pts-3">✅ Diferencia</span><strong>{{ stats().diferencias }}</strong></div>
+            <div class="pts-row"><span class="pts-chip pts-1">👍 Ganador</span><strong>{{ stats().ganadores }}</strong></div>
+            <div class="pts-row"><span class="pts-chip pts-0">❌ Fallos</span><strong>{{ stats().fallos }}</strong></div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Columna derecha: historial -->
+      <main class="perfil-main">
+        <div class="card historial-card">
+          <h3 class="card-title">📋 Historial de apuestas resueltas</h3>
+
+          @if (ultimas().length === 0) {
+            <div class="empty-state" style="padding: 3rem 1rem;">
+              <span class="empty-icon">📭</span>
+              <p>Tus apuestas aparecerán aquí cuando los partidos finalicen.</p>
+            </div>
+          } @else {
+            <div class="historial-list">
+              @for (a of ultimas(); track trackByApuesta($index, a)) {
+                <div class="historial-item">
+                  <div class="hist-partido">
+                    <span class="hist-equipos">
+                      {{ bandera(a.partido?.equipo_local ?? '') }} {{ a.partido?.equipo_local }}
+                      <span class="hist-sep">vs</span>
+                      {{ a.partido?.equipo_visitante }} {{ bandera(a.partido?.equipo_visitante ?? '') }}
+                    </span>
+                    <span class="hist-fecha">{{ formatFecha(a.partido?.date_dt ?? a.created_at) }}</span>
+                  </div>
+
+                  <div class="hist-scores">
+                    <div class="hist-score-group">
+                      <span class="hist-score-label">Real</span>
+                      <span class="hist-score">
+                        {{ a.partido?.goles_local ?? '?' }} - {{ a.partido?.goles_visitante ?? '?' }}
+                      </span>
+                    </div>
+                    <div class="hist-score-group">
+                      <span class="hist-score-label">Tu apuesta</span>
+                      <span class="hist-score">{{ a.goles_local }} - {{ a.goles_visitante }}</span>
+                    </div>
+                    <span class="pts-chip" [class]="ptsClass(a.puntos_obtenidos)">
+                      {{ ptsIcon(a.puntos_obtenidos) }} {{ a.puntos_obtenidos }} pts
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </main>
+
+    </div>
+  }
+</div>

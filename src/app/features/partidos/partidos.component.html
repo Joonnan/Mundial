@@ -1,0 +1,159 @@
+<!-- src/app/features/partidos/partidos.component.html -->
+<div class="page-wrap">
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="tab() === 'grupos'" (click)="setTab('grupos')">
+      ⚽ Fase de Grupos
+    </button>
+    <button class="tab-btn" [class.active]="tab() === 'torneo'" (click)="setTab('torneo')">
+      🏆 Fase de Torneo
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Cargando partidos...</span>
+    </div>
+  }
+
+  <!-- Contenido -->
+  @if (!loading()) {
+    @for (key of keys(); track trackByGrupo($index, key)) {
+      <section class="group-section">
+        <h2 class="group-title">{{ key }}</h2>
+
+        <div class="cards-grid">
+          @for (p of agrupados()[key]; track trackByPartido($index, p)) {
+            <div class="partido-card"
+                 [class.card-bloqueado]="p.bloqueado"
+                 [class.card-finalizado]="p.estado === 'finalizado'">
+
+              <!-- Header del partido -->
+              <div class="card-header">
+                <span class="match-num">#{{ p.match_number }}</span>
+                <span class="badge"
+                      [class.badge-pendiente]="!p.bloqueado && p.estado !== 'finalizado'"
+                      [class.badge-bloqueado]="p.bloqueado && p.estado !== 'finalizado'"
+                      [class.badge-finalizado]="p.estado === 'finalizado'">
+                  {{ p.estado === 'finalizado' ? '✓ Finalizado' : p.bloqueado ? '🔒 Bloqueado' : '🟢 Abierto' }}
+                </span>
+              </div>
+
+              <!-- Equipos y marcador -->
+   <div class="equipos-row">
+                <div class="equipo equipo-local">
+                  <div class="bandera-wrap">
+                    @if (isRealTeam(p.equipo_local)) {
+                      <img [src]="getFlagUrl(p.equipo_local)" [alt]="p.equipo_local" class="bandera-img" />
+                    } @else {
+                      <span class="bandera-placeholder">🏆</span>
+                    }
+                  </div>
+                  <span class="equipo-nombre">{{ p.equipo_local }}</span>
+                </div>
+
+                <div class="marcador-central">
+                  @if (p.estado === 'finalizado') {
+                    <span class="marcador-real">{{ p.goles_local }} - {{ p.goles_visitante }}</span>
+                  } @else {
+                    <span class="vs-text">vs</span>
+                  }
+                </div>
+
+                <div class="equipo equipo-visitante">
+                  <span class="equipo-nombre">{{ p.equipo_visitante }}</span>
+                  <div class="bandera-wrap">
+                    @if (isRealTeam(p.equipo_visitante)) {
+                      <img [src]="getFlagUrl(p.equipo_visitante)" [alt]="p.equipo_visitante" class="bandera-img" />
+                    } @else {
+                      <span class="bandera-placeholder">🏆</span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Info del partido -->
+              <div class="partido-meta">
+                <span>🏟️ {{ p.estadio }}</span>
+                <span>📅 {{ formatFecha(p.date_dt) }}</span>
+              </div>
+
+              <!-- Zona de apuesta (solo usuarios logueados) -->
+              @if (auth.usuario()) {
+                <div class="apuesta-zone">
+
+                  <!-- Partido finalizado con puntos -->
+                  @if (p.apuesta && p.apuesta.puntos_obtenidos !== null && p.apuesta.puntos_obtenidos !== undefined) {
+                    <div class="apuesta-result">
+                      <span class="apuesta-label">
+                        Tu apuesta: <strong>{{ p.apuesta.goles_local }} - {{ p.apuesta.goles_visitante }}</strong>
+                      </span>
+                      <span class="pts-chip" [class]="ptsClass(p.apuesta.puntos_obtenidos)">
+                        {{ ptsIcon(p.apuesta.puntos_obtenidos) }} {{ p.apuesta.puntos_obtenidos }} pts
+                      </span>
+                    </div>
+                  }
+
+                  <!-- Partido bloqueado con apuesta guardada (sin resolver) -->
+                  @else if (p.bloqueado && p.apuesta) {
+                    <div class="apuesta-result">
+                      <span class="apuesta-label">
+                        Tu apuesta: <strong>{{ p.apuesta.goles_local }} - {{ p.apuesta.goles_visitante }}</strong>
+                      </span>
+                      <span class="pts-chip pts-pending">⏳ Pendiente</span>
+                    </div>
+                  }
+
+                  <!-- Partido bloqueado sin apuesta -->
+                  @else if (p.bloqueado && !p.apuesta) {
+                    <p class="sin-apuesta">No realizaste apuesta para este partido</p>
+                  }
+
+                  <!-- Partido abierto — formulario de apuesta -->
+                  @else if (!p.bloqueado) {
+                    <div class="apuesta-form">
+                      <div class="score-inputs">
+                        <input
+                          type="number" min="0" max="20"
+                          class="score-input"
+                          [(ngModel)]="p.draftLocal"
+                          placeholder="0" />
+                        <span class="score-sep">-</span>
+                        <input
+                          type="number" min="0" max="20"
+                          class="score-input"
+                          [(ngModel)]="p.draftVisitante"
+                          placeholder="0" />
+                      </div>
+                      <button class="btn btn-primary btn-apostar"
+                              [disabled]="p.saving"
+                              (click)="guardar(p)">
+                        {{ p.saving ? '...' : p.apuesta ? 'Actualizar' : '⚽ Apostar' }}
+                      </button>
+                    </div>
+                  }
+
+                  @if (p.msg) {
+                    <p class="apuesta-msg" [class.ok]="p.msg.ok">{{ p.msg.text }}</p>
+                  }
+
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (keys().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">📭</span>
+        <p>No hay partidos disponibles en esta fase todavía.</p>
+      </div>
+    }
+  }
+</div>

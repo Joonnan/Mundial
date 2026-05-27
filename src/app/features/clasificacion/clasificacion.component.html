@@ -1,0 +1,115 @@
+<!-- src/app/features/clasificacion/clasificacion.component.html -->
+<div class="page-wrap">
+  <h1 class="section-title">🏆 Clasificación</h1>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Cargando clasificación...</span>
+    </div>
+  }
+
+  @if (!loading()) {
+
+    <!-- Tu posición (banner rápido) -->
+    @if (miPosicion()) {
+      <div class="mi-posicion-banner">
+        <div class="mi-pos-info">
+          <span class="mi-pos-num">{{ medalla(miPosicion()!.posicion) }}</span>
+          <div>
+            <p class="mi-pos-label">Tu posición actual</p>
+            <p class="mi-pos-pts">{{ miPosicion()!.puntos_total }} puntos — {{ miPosicion()!.partidos_jugados }} partidos apostados</p>
+          </div>
+        </div>
+        <div class="mi-pos-stats">
+          <span class="stat-mini">🎯 {{ miPosicion()!.exactos }}</span>
+          <span class="stat-mini">✅ {{ miPosicion()!.diferencias }}</span>
+          <span class="stat-mini">👍 {{ miPosicion()!.ganadores }}</span>
+          <span class="stat-mini">❌ {{ miPosicion()!.fallos }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Podio -->
+    @if (podio().length >= 3) {
+      <div class="podio-wrap">
+        @for (r of podio(); track r.id) {
+          <div class="podio-item" [class.podio-1]="r.posicion===1" [class.podio-2]="r.posicion===2" [class.podio-3]="r.posicion===3">
+            <div class="podio-avatar" [class.es-mio]="esMio(r)">
+              {{ inicial(r) }}
+            </div>
+            <p class="podio-nombre">{{ r.display_name || r.username }}</p>
+            <p class="podio-pts">{{ r.puntos_total }} pts</p>
+            <div class="podio-bloque" [style.height.px]="podioAltura(r)">
+              <span class="podio-medalla">{{ medalla(r.posicion) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tabla completa -->
+    @if (rows().length > 0) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pos</th>
+              <th>Jugador</th>
+              <th>Puntos</th>
+              <th class="hide-sm">🎯 Exactos</th>
+              <th class="hide-sm">✅ Diferencia</th>
+              <th class="hide-sm">👍 Ganador</th>
+              <th class="hide-sm">❌ Fallos</th>
+              <th>Jugados</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of rows(); track trackByRow($index, r)) {
+              <tr [class.row-mio]="esMio(r)">
+                <td>
+                  <span class="pos-cell">{{ medalla(r.posicion) }}</span>
+                </td>
+                <td>
+                  <div class="jugador-cell">
+                    <div class="av-sm" [class.av-mio]="esMio(r)">{{ inicial(r) }}</div>
+                    <div class="jugador-info">
+                      <span class="jugador-nombre">{{ r.display_name || r.username }}</span>
+                      <span class="jugador-user">@{{ r.username }}</span>
+                    </div>
+                    @if (esMio(r)) {
+                      <span class="tu-badge">Tú</span>
+                    }
+                  </div>
+                </td>
+                <td><span class="pts-total">{{ r.puntos_total }}</span></td>
+                <td class="hide-sm center">{{ r.exactos }}</td>
+                <td class="hide-sm center">{{ r.diferencias }}</td>
+                <td class="hide-sm center">{{ r.ganadores }}</td>
+                <td class="hide-sm center">{{ r.fallos }}</td>
+                <td class="center">{{ r.partidos_jugados }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="empty-icon">📊</span>
+        <p>Aún no hay puntos registrados. ¡Empieza a apostar!</p>
+      </div>
+    }
+
+    <!-- Leyenda -->
+    <div class="leyenda">
+      <p class="leyenda-title">Sistema de puntuación</p>
+      <div class="leyenda-chips">
+        <span class="pts-chip pts-5">🎯 5 pts — Resultado exacto</span>
+        <span class="pts-chip pts-3">✅ 3 pts — Diferencia de goles</span>
+        <span class="pts-chip pts-1">👍 1 pt — Acertar ganador</span>
+        <span class="pts-chip pts-0">❌ 0 pts — Fallo</span>
+      </div>
+    </div>
+
+  }
+</div>
