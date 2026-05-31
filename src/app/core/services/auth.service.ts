@@ -8,7 +8,7 @@ import { Usuario } from '../models';
 export class AuthService {
   private supa = inject(SupabaseService).client;
   private router = inject(Router);
-  private ngZone = inject(NgZone); // Inyectamos la zona de Angular
+  private ngZone = inject(NgZone);
 
   readonly usuario = signal<Usuario | null>(null);
   readonly loading = signal(true);
@@ -16,7 +16,6 @@ export class AuthService {
   readonly isLoggedIn = computed(() => !!this.usuario());
 
   constructor() {
-    // Escuchar cambios de auth y forzar a que Angular actualice la vista
     this.supa.auth.onAuthStateChange((_event, session) => {
       this.ngZone.run(() => {
         if (session) {
@@ -36,29 +35,70 @@ export class AuthService {
         .select('*')
         .eq('id', id)
         .single();
-        
-      // Actualizamos los signals dentro de NgZone
+
       this.ngZone.run(() => {
         this.usuario.set(data ?? null);
         this.loading.set(false);
       });
-    } catch (error) {
-      // Por si hay algún error de red, quitamos el estado de carga
+    } catch {
       this.ngZone.run(() => {
         this.loading.set(false);
       });
     }
   }
 
+  /**
+   * Espera a que el signal `loading` sea false y devuelve el usuario.
+   * Evita la condición de carrera entre signIn y onAuthStateChange.
+   */
+  private waitForUsuario(timeoutMs = 8000): Promise<Usuario | null> {
+    return new Promise((resolve) => {
+      // Si ya terminó de cargar, resolvemos de inmediato
+      if (!this.loading()) {
+        resolve(this.usuario());
+        return;
+      }
+
+      const interval = setInterval(() => {
+        if (!this.loading()) {
+          clearInterval(interval);
+          clearTimeout(timeout);
+          resolve(this.usuario());
+        }
+      }, 50);
+
+      // Timeout de seguridad para no bloquear la UI indefinidamente
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        resolve(this.usuario()); // devuelve lo que haya, aunque sea null
+      }, timeoutMs);
+    });
+  }
+
+  /**
+   * Inicia sesión y espera a que el usuario esté completamente cargado
+   * antes de devolver el control al componente.
+   */
   async signIn(email: string, password: string): Promise<string | null> {
+    // Marcamos loading = true para que waitForUsuario no resuelva prematuramente
+    this.loading.set(true);
+
     const { error } = await this.supa.auth.signInWithPassword({ email, password });
-    return error?.message ?? null;
+    if (error) {
+      this.loading.set(false);
+      return error.message;
+    }
+
+    // Esperamos a que onAuthStateChange → fetchUsuario terminen
+    await this.waitForUsuario();
+    return null;
   }
 
   async signUp(email: string, password: string, username: string): Promise<string | null> {
     const { error } = await this.supa.auth.signUp({
-      email, password,
-      options: { data: { username, display_name: username } }
+      email,
+      password,
+      options: { data: { username, display_name: username } },
     });
     return error?.message ?? null;
   }
