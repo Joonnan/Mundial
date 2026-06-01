@@ -18,23 +18,51 @@
     </div>
 
     <!-- Form -->
-    <form [formGroup]="form" (ngSubmit)="submit()" class="form-wrap">
+    <!-- FIX: quitado el (ngSubmit) del form y movido el submit al botón
+         para evitar dobles envíos en algunos navegadores móviles -->
+    <div class="form-wrap">
       @if (mode === 'register') {
         <div class="field">
           <label>Nombre de usuario</label>
-          <input type="text" formControlName="username" placeholder="crack2026" />
-          @if (form.get('username')?.touched && form.get('username')?.invalid) {
+          <input
+            type="text"
+            [formControl]="$any(form.get('username'))"
+            placeholder="crack2026"
+            autocomplete="username"
+          />
+          @if (form.get('username')?.touched && form.get('username')?.errors?.['required']) {
+            <span class="field-error">El nombre de usuario es obligatorio</span>
+          }
+          @if (form.get('username')?.touched && form.get('username')?.errors?.['minlength']) {
             <span class="field-error">Mínimo 3 caracteres</span>
           }
         </div>
       }
+
       <div class="field">
         <label>Email</label>
-        <input type="email" formControlName="email" placeholder="tu@email.com" />
+        <input
+          type="email"
+          [formControl]="$any(form.get('email'))"
+          placeholder="tu@email.com"
+          autocomplete="email"
+        />
+        @if (form.get('email')?.touched && form.get('email')?.invalid) {
+          <span class="field-error">Introduce un email válido</span>
+        }
       </div>
+
       <div class="field">
         <label>Contraseña</label>
-        <input type="password" formControlName="password" placeholder="••••••••" />
+        <input
+          type="password"
+          [formControl]="$any(form.get('password'))"
+          placeholder="••••••••"
+          autocomplete="{{ mode === 'login' ? 'current-password' : 'new-password' }}"
+        />
+        @if (form.get('password')?.touched && form.get('password')?.errors?.['minlength']) {
+          <span class="field-error">Mínimo 6 caracteres</span>
+        }
       </div>
 
       @if (error) {
@@ -44,9 +72,15 @@
         <div class="alert alert-success">{{ success }}</div>
       }
 
-      <button type="submit" class="btn-submit" [disabled]="loading">
+      <button
+        type="button"
+        class="btn-submit"
+        [disabled]="loading"
+        (click)="submit()"
+      >
         {{ loading ? 'Cargando...' : mode === 'login' ? '⚽ Entrar' : '🎉 Crear cuenta' }}
       </button>
-    </form>
+    </div>
+
   </div>
 </div>

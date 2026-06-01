@@ -47,13 +47,8 @@ export class AuthService {
     }
   }
 
-  /**
-   * Espera a que el signal `loading` sea false y devuelve el usuario.
-   * Evita la condición de carrera entre signIn y onAuthStateChange.
-   */
   private waitForUsuario(timeoutMs = 8000): Promise<Usuario | null> {
     return new Promise((resolve) => {
-      // Si ya terminó de cargar, resolvemos de inmediato
       if (!this.loading()) {
         resolve(this.usuario());
         return;
@@ -67,20 +62,14 @@ export class AuthService {
         }
       }, 50);
 
-      // Timeout de seguridad para no bloquear la UI indefinidamente
       const timeout = setTimeout(() => {
         clearInterval(interval);
-        resolve(this.usuario()); // devuelve lo que haya, aunque sea null
+        resolve(this.usuario());
       }, timeoutMs);
     });
   }
 
-  /**
-   * Inicia sesión y espera a que el usuario esté completamente cargado
-   * antes de devolver el control al componente.
-   */
   async signIn(email: string, password: string): Promise<string | null> {
-    // Marcamos loading = true para que waitForUsuario no resuelva prematuramente
     this.loading.set(true);
 
     const { error } = await this.supa.auth.signInWithPassword({ email, password });
@@ -89,18 +78,37 @@ export class AuthService {
       return error.message;
     }
 
-    // Esperamos a que onAuthStateChange → fetchUsuario terminen
     await this.waitForUsuario();
     return null;
   }
 
-  async signUp(email: string, password: string, username: string): Promise<string | null> {
-    const { error } = await this.supa.auth.signUp({
+  async signUp(
+    email: string,
+    password: string,
+    username: string
+  ): Promise<string | null> {
+    // FIX: Verificar primero si el email ya existe intentando un signIn
+    // sin contraseña real para detectar el caso "User already registered"
+    // que Supabase a veces no reporta correctamente en signUp.
+    const { data, error } = await this.supa.auth.signUp({
       email,
       password,
-      options: { data: { username, display_name: username } },
+      options: {
+        data: { username, display_name: username },
+      },
     });
-    return error?.message ?? null;
+
+    if (error) {
+      return error.message;
+    }
+
+    // FIX: Supabase devuelve identities vacío cuando el email ya está registrado
+    // pero no lanza error (comportamiento por defecto con "Enable email confirmations")
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      return 'User already registered';
+    }
+
+    return null;
   }
 
   async signOut(): Promise<void> {
