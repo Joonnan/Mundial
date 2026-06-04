@@ -364,7 +364,7 @@ $border-color:    #f1f5f9; // Bordes sutiles
   // Ocultar flechas nativas de números
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  &[type=number] { -moz-appearance: textfield; }
+  &[type=number] { appearance: textfield; -moz-appearance: textfield; }
 }
 
 .separador-marcador {

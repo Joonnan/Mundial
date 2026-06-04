@@ -150,6 +150,7 @@ $border-color:    #f1f5f9; // Líneas divisorias sutiles
     font-weight: 600;
     color: $text-dark;
     outline: none;
+    appearance: none;
     -webkit-appearance: none; // Quita estilos nativos raros de iOS
     @include transition-smooth;
 

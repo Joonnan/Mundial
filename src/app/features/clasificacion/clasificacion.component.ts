@@ -154,7 +154,6 @@ export class ClasificacionComponent implements OnInit {
   esMio(r: ClasificacionRow): boolean {
     return r.id === this.auth.usuario()?.id;
   }
-
   trackByRow(_: number, r: ClasificacionRow) { return r.id; }
 
   // ── Helpers grupos ─────────────────────────────────────────

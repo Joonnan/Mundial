@@ -341,7 +341,6 @@ $podio-3nd-start:  #fcd34d; $podio-3nd-end:  #d97706;
   flex-wrap: wrap;
   margin: 0 1.5rem 1.5rem;
 }
-
 .gpill {
   border: none;
   background: #fff;
@@ -352,15 +351,12 @@ $podio-3nd-start:  #fcd34d; $podio-3nd-end:  #d97706;
   cursor: pointer;
   font-weight: 700;
   font-size: .85rem;
-
   @include transition-smooth;
-
   &:hover {
     border-color: $verde-light;
     color: $verde;
     transform: translateY(-1px);
   }
-
   &.gpill-active {
     background: $verde;
     color: #fff;
