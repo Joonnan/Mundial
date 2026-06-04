@@ -1,16 +1,15 @@
-<!-- src/app/features/admin/admin-panel.component.html -->
 <div class="page-wrap">
 
-  <!-- Header -->
   <div class="admin-header">
     <div>
       <h1 class="admin-title">🛠️ Panel de Administrador</h1>
-      <p class="admin-sub">Gestión de resultados · Porra Mundial 2026</p>
+      <p class="admin-sub">Gestión rápida de resultados · Porra Mundial 2026</p>
     </div>
-    <button class="btn btn-ghost btn-sm" (click)="loadPartidos()">🔄 Refrescar</button>
+    <button class="btn btn-ghost btn-sm" (click)="loadPartidos()" [disabled]="loading()">
+      🔄 {{ loading() ? 'Cargando...' : 'Refrescar' }}
+    </button>
   </div>
 
-  <!-- Stats rápidas -->
   <div class="stats-grid">
     <div class="stat-card">
       <span class="stat-icon">⚽</span>
@@ -42,38 +41,45 @@
     </div>
   </div>
 
-  <!-- Filtros -->
   <div class="filtros-bar">
-    <input
-      class="input-base filtro-search"
-      type="text"
-      placeholder="🔍 Buscar equipo, estadio o nº partido..."
-      [value]="busqueda()"
-      (input)="setBusqueda($any($event.target).value)" />
+    <div class="search-wrapper">
+      <input
+        class="input-base filtro-search"
+        type="text"
+        placeholder="🔍 Buscar equipo, estadio o nº partido..."
+        [value]="busqueda()"
+        (input)="setBusqueda($any($event.target).value)" />
+      @if (busqueda()) {
+        <button class="clear-search" (click)="setBusqueda('')">✕</button>
+      }
+    </div>
 
     <div class="filtro-tabs">
-      <button class="ftab" [class.active]="filtroEstado()==='todos'"     (click)="setFiltro('todos')">Todos</button>
-      <button class="ftab" [class.active]="filtroEstado()==='pendiente'" (click)="setFiltro('pendiente')">Pendientes</button>
-      <button class="ftab" [class.active]="filtroEstado()==='finalizado'"(click)="setFiltro('finalizado')">Finalizados</button>
+      <button class="ftab" [class.active]="filtroEstado()==='todos'" (click)="setFiltro('todos')">
+        Todos <span class="badge-count">{{ stats().total }}</span>
+      </button>
+      <button class="ftab" [class.active]="filtroEstado()==='pendiente'" (click)="setFiltro('pendiente')">
+        Pendientes <span class="badge-count count-pend">{{ stats().pendientes }}</span>
+      </button>
+      <button class="ftab" [class.active]="filtroEstado()==='finalizado'" (click)="setFiltro('finalizado')">
+        Finalizados <span class="badge-count count-fin">{{ stats().finalizados }}</span>
+      </button>
     </div>
   </div>
 
-  <!-- Mensaje global -->
   @if (globalMsg()) {
-    <div class="alert" [class.alert-success]="globalMsg()!.ok" [class.alert-error]="!globalMsg()!.ok">
-      {{ globalMsg()!.text }}
+    <div class="alert animate-fade-in" [class.alert-success]="globalMsg()!.ok" [class.alert-error]="!globalMsg()!.ok">
+      <span>{{ globalMsg()!.text }}</span>
     </div>
   }
 
-  <!-- Loading -->
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <span>Cargando partidos...</span>
+      <span>Cargando partidos de la FIFA...</span>
     </div>
   }
 
-  <!-- Partidos agrupados -->
   @if (!loading()) {
     @for (fase of fasesKeys(); track trackByFase($index, fase)) {
       <section class="fase-section">
@@ -83,109 +89,87 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:50px">#</th>
-                <th>Partido</th>
-                <th>Fecha</th>
-                <th class="hide-md">Estadio</th>
-                <th>Estado</th>
-                <th style="width:90px">Marcador</th>
-                <th style="width:180px">Acción</th>
+                <th style="width: 60px">#</th>
+                <th class="hide-md">Fecha / Estadio</th>
+                <th class="text-center">Partido y Marcador Directo</th>
+                <th style="width: 100px" class="text-center">Estado</th>
+                <th style="width: 180px" class="text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
               @for (p of agrupados()[fase]; track trackByPartido($index, p)) {
-                <!-- Fila del partido -->
-                <tr [class.row-finalizado]="p.estado==='finalizado'" [class.row-editando]="p.editando">
+                <tr [class.row-finalizado]="p.estado==='finalizado'" [class.row-saving]="p.saving">
+                  
                   <td><span class="num-cell">#{{ p.match_number }}</span></td>
-                  <td>
-                    <div class="partido-cell">
-                      <span class="bandera-sm">{{ bandera(p.equipo_local) }}</span>
-                      <span class="equipo-sm">{{ p.equipo_local }}</span>
-                      <span class="vs-sm">vs</span>
-                      <span class="equipo-sm">{{ p.equipo_visitante }}</span>
-                      <span class="bandera-sm">{{ bandera(p.equipo_visitante) }}</span>
+                  
+                  <td class="hide-md">
+                    <div class="info-cell">
+                      <span class="fecha-cell">📅 {{ formatFecha(p.date_dt) }}</span>
+                      <span class="estadio-cell">📍 {{ p.estadio }}</span>
                     </div>
                   </td>
-                  <td><span class="fecha-cell">{{ formatFecha(p.date_dt) }}</span></td>
-                  <td class="hide-md"><span class="estadio-cell">{{ p.estadio }}</span></td>
+                  
                   <td>
-                    <span class="badge"
-                          [class.badge-finalizado]="p.estado==='finalizado'"
-                          [class.badge-bloqueado]="p.estado==='pendiente'"
-                          [class.badge-pendiente]="p.estado==='pendiente' && !p.editando">
+                    <div class="partido-marcador-row">
+                      
+                      <div class="equipo-wrapper local">
+                        <span class="equipo-name">{{ p.equipo_local }}</span>
+                        <span class="bandera-dinamica">{{ bandera(p.equipo_local) }}</span>
+                      </div>
+
+                      <div class="inputs-marcador-wrap">
+                        <input
+                          type="number" min="0" max="99"
+                          class="score-live-input"
+                          [(ngModel)]="p.draftLocal"
+                          [disabled]="p.estado === 'finalizado' || p.saving"
+                          placeholder="-" />
+                        
+                        <span class="separador-marcador">:</span>
+                        
+                        <input
+                          type="number" min="0" max="99"
+                          class="score-live-input"
+                          [(ngModel)]="p.draftVisitante"
+                          [disabled]="p.estado === 'finalizado' || p.saving"
+                          placeholder="-" />
+                      </div>
+
+                      <div class="equipo-wrapper visitante">
+                        <span class="bandera-dinamica">{{ bandera(p.equipo_visitante) }}</span>
+                        <span class="equipo-name">{{ p.equipo_visitante }}</span>
+                      </div>
+
+                    </div>
+                  </td>
+
+                  <td class="text-center">
+                    <span class="badge" [class.badge-finalizado]="p.estado==='finalizado'" [class.badge-pendiente]="p.estado==='pendiente'">
                       {{ p.estado === 'finalizado' ? '✓ Final' : '⏳ Pendiente' }}
                     </span>
                   </td>
-                  <td>
-                    @if (p.estado === 'finalizado') {
-                      <span class="marcador-cell">{{ p.goles_local }} - {{ p.goles_visitante }}</span>
-                    } @else {
-                      <span class="sin-marcador">—</span>
-                    }
-                  </td>
-                  <td>
-                    <div class="accion-btns">
-                      @if (p.estado === 'finalizado' && !p.editando) {
-                        <button class="btn btn-gold btn-sm" (click)="abrirEdicion(p)" [disabled]="p.saving">
-                          ✏️ Editar
-                        </button>
-                        <button class="btn btn-ghost btn-sm" (click)="reabrir(p)" [disabled]="p.saving">
-                          ↩ Reabrir
-                        </button>
-                      } @else if (!p.editando) {
-                        <button class="btn btn-primary btn-sm" (click)="abrirEdicion(p)">
-                          ⚽ Resultado
+
+                  <td class="text-right">
+                    <div class="accion-btns j-end">
+                      @if (p.estado === 'pendiente') {
+                        <button 
+                          class="btn btn-primary btn-sm btn-save" 
+                          (click)="guardarMarcador(p)" 
+                          [disabled]="p.saving || p.draftLocal === '' || p.draftVisitante === ''">
+                          {{ p.saving ? '⏳' : '💾 Guardar' }}
                         </button>
                       } @else {
-                        <span class="editando-label">✏️ Editando...</span>
+                        <button 
+                          class="btn btn-ghost btn-sm btn-reopen" 
+                          (click)="reabrir(p)" 
+                          [disabled]="p.saving">
+                          ↩ Reabrir
+                        </button>
                       }
                     </div>
                   </td>
+
                 </tr>
-
-                <!-- Fila de edición inline -->
-                @if (p.editando) {
-                  <tr class="edit-row">
-                    <td colspan="7">
-                      <div class="edit-form">
-                        <div class="edit-equipos">
-                          <span class="edit-equipo">{{ bandera(p.equipo_local) }} {{ p.equipo_local }}</span>
-                          <div class="edit-inputs">
-                            <input
-                              type="number" min="0" max="30"
-                              class="score-input-admin"
-                              [(ngModel)]="p.draftLocal"
-                              placeholder="0" />
-                            <span class="edit-guion">-</span>
-                            <input
-                              type="number" min="0" max="30"
-                              class="score-input-admin"
-                              [(ngModel)]="p.draftVisitante"
-                              placeholder="0" />
-                          </div>
-                          <span class="edit-equipo">{{ p.equipo_visitante }} {{ bandera(p.equipo_visitante) }}</span>
-                        </div>
-
-                        <div class="edit-actions">
-                          <button class="btn btn-primary"
-                                  (click)="guardarMarcador(p)"
-                                  [disabled]="p.saving">
-                            {{ p.saving ? 'Guardando...' : '💾 Guardar y calcular puntos' }}
-                          </button>
-                          <button class="btn btn-ghost" (click)="cancelarEdicion(p.match_number)">
-                            Cancelar
-                          </button>
-                        </div>
-
-                        <p class="edit-hint">
-                          💡 Al guardar, el trigger SQL calculará automáticamente los puntos de todos los usuarios que apostaron
-                          (5 pts exacto · 3 pts diferencia · 1 pt ganador).
-                          Si ya tenía resultado previo, los puntos se <strong>recalcularán</strong> correctamente.
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                }
               }
             </tbody>
           </table>
@@ -196,7 +180,7 @@
     @if (fasesKeys().length === 0) {
       <div class="empty-state">
         <span class="empty-icon">🔍</span>
-        <p>Sin resultados para tu búsqueda.</p>
+        <p>No se encontraron partidos que coincidan con la búsqueda.</p>
       </div>
     }
   }
