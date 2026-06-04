@@ -1,0 +1,59 @@
+<div class="page-wrap">
+
+  <div class="page-header">
+    <h1>🏆 Premios del Mundial 2026</h1>
+    <p>
+      Realiza tus predicciones para los premios individuales y colectivos.
+    </p>
+  </div>
+
+  <div class="cards-grid">
+
+    @for (premio of premios(); track premio.id) {
+
+      <div class="premio-card">
+
+        <div class="card-top">
+          <div class="icon">
+            {{ premio.icono }}
+          </div>
+
+          <div>
+            <h3>{{ premio.titulo }}</h3>
+            <p>{{ premio.descripcion }}</p>
+          </div>
+        </div>
+
+        <div class="card-body">
+
+          <label>
+            Tu elección
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="premio.valor"
+            placeholder="Escribe tu predicción..." />
+
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+  <div class="actions">
+
+    <button
+      class="btn-save"
+      [disabled]="guardando()"
+      (click)="guardar()">
+
+      {{ guardando() ? 'Guardando...' : '💾 Guardar Predicciones' }}
+
+    </button>
+
+  </div>
+
+</div>

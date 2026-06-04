@@ -28,6 +28,10 @@ export const routes: Routes = [
       {
         path: 'admin',
         loadComponent: () => import('./features/admin/admin-panel.component').then(m => m.AdminPanelComponent),
+      },
+      {
+           path: 'premios',
+        loadComponent: () => import('./features/premios/premios.component').then(m => m.PremiosComponent),
       }
     ]
   },

@@ -1,7 +1,15 @@
-<!-- src/app/features/partidos/partidos.component.html -->
 <div class="page-wrap">
 
-  <!-- Tabs -->
+    <div class="page-hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="hero-trophy">⚽ </span>
+        Partidos del Mundial 2026
+      </h1>
+    </div>
+    </div>
+
   <div class="tab-bar">
     <button class="tab-btn" [class.active]="tab() === 'grupos'" (click)="setTab('grupos')">
       ⚽ Fase de Grupos
@@ -11,7 +19,35 @@
     </button>
   </div>
 
-  <!-- Loading -->
+  @if (!loading()) {
+    <div class="search-bar-container">
+      <input 
+        type="text" 
+        class="search-field"
+        [ngModel]="searchQuery()" 
+        (ngModelChange)="searchQuery.set($event)"
+        placeholder="🔍 Buscar por equipo o grupo (ej: 'Spain', 'Grupo B')..." />
+      @if (searchQuery()) {
+        <button class="btn-clear" (click)="searchQuery.set('')">✕</button>
+      }
+  <!-- NUEVO: Combo Selector de Grupos (Solo se muestra en la pestaña de grupos) -->
+      @if (tab() === 'grupos') {
+        <div class="select-container">
+          <select 
+            class="group-select"
+            [ngModel]="selectedGrupo()"
+            (ngModelChange)="selectedGrupo.set($event)">
+            <option value="">🌍 Todos los Grupos</option>
+            @for (g of grupos(); track g) {
+              <option [value]="g">📦 Grupo {{ g }}</option>
+            }
+          </select>
+        </div>
+      }
+    </div>
+  }
+  
+
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
@@ -19,8 +55,113 @@
     </div>
   }
 
-  <!-- Contenido -->
   @if (!loading()) {
+
+    @if (proximosPartidos().length > 0 && !searchQuery()) {
+      <section class="upcoming-section">
+        <h2 class="section-title">⏰ Próximos Partidos</h2>
+        
+        <div class="cards-grid">
+          @if (proximosPartidos().length > 0 && !searchQuery() && !selectedGrupo()) {
+          @for (p of proximosPartidos(); track trackByPartido($index, p)) {
+            <div class="partido-card card-upcoming"
+                 [class.card-bloqueado]="p.bloqueado">
+
+              <div class="card-header">
+                <span class="match-num">#{{ p.match_number }} — {{ p.grupo ? 'Grupo ' + p.grupo : nombreFase[p.fase] }}</span>
+                <span class="badge"
+                      [class.badge-pendiente]="!p.bloqueado"
+                      [class.badge-bloqueado]="p.bloqueado">
+                  {{ p.bloqueado ? '🔒 Bloqueado' : '🟢 Abierto' }}
+                </span>
+              </div>
+
+              <div class="equipos-row">
+                <div class="equipo equipo-local">
+                  <div class="bandera-wrap">
+                    @if (isRealTeam(p.equipo_local)) {
+                      <img [src]="getFlagUrl(p.equipo_local)" [alt]="p.equipo_local" class="bandera-img" />
+                    } @else {
+                      <span class="bandera-placeholder">🏆</span>
+                    }
+                  </div>
+                  <span class="equipo-nombre">{{ p.equipo_local }}</span>
+                </div>
+
+                <div class="marcador-central">
+                  <span class="vs-text">vs</span>
+                </div>
+
+                <div class="equipo equipo-visitante">
+                  <span class="equipo-nombre">{{ p.equipo_visitante }}</span>
+                  <div class="bandera-wrap">
+                    @if (isRealTeam(p.equipo_visitante)) {
+                      <img [src]="getFlagUrl(p.equipo_visitante)" [alt]="p.equipo_visitante" class="bandera-img" />
+                    } @else {
+                      <span class="bandera-placeholder">🏆</span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="partido-meta">
+                <span>🏟️ {{ p.estadio }}</span>
+                <span>📅 {{ formatFecha(p.date_dt) }}</span>
+              </div>
+
+              @if (auth.usuario()) {
+                <div class="apuesta-zone">
+
+                  @if (p.bloqueado && p.apuesta) {
+                    <div class="apuesta-result">
+                      <span class="apuesta-label">
+                        Tu apuesta: <strong>{{ p.apuesta.goles_local }} - {{ p.apuesta.goles_visitante }}</strong>
+                      </span>
+                      <span class="pts-chip pts-pending">⏳ Pendiente</span>
+                    </div>
+                  }
+
+                  @else if (p.bloqueado && !p.apuesta) {
+                    <p class="sin-apuesta">No realizaste apuesta para este partido</p>
+                  }
+
+                  @else if (!p.bloqueado) {
+                    <div class="apuesta-form">
+                      <div class="score-inputs">
+                        <input
+                          type="number" min="0" max="20"
+                          class="score-input"
+                          [(ngModel)]="p.draftLocal"
+                          placeholder="0" />
+                        <span class="score-sep">-</span>
+                        <input
+                          type="number" min="0" max="20"
+                          class="score-input"
+                          [(ngModel)]="p.draftVisitante"
+                          placeholder="0" />
+                      </div>
+                      <button class="btn btn-primary btn-apostar"
+                              [disabled]="p.saving"
+                              (click)="guardar(p)">
+                        {{ p.saving ? '...' : p.apuesta ? 'Actualizar' : '⚽ Apostar' }}
+                      </button>
+                    </div>
+                  }
+
+                  @if (p.msg) {
+                    <p class="apuesta-msg" [class.ok]="p.msg.ok">{{ p.msg.text }}</p>
+                  }
+                </div>
+              }
+
+            </div>
+          }
+          }
+        </div>
+      </section>
+      <hr class="section-divider" />
+    }
+
     @for (key of keys(); track trackByGrupo($index, key)) {
       <section class="group-section">
         <h2 class="group-title">{{ key }}</h2>
@@ -31,7 +172,6 @@
                  [class.card-bloqueado]="p.bloqueado"
                  [class.card-finalizado]="p.estado === 'finalizado'">
 
-              <!-- Header del partido -->
               <div class="card-header">
                 <span class="match-num">#{{ p.match_number }}</span>
                 <span class="badge"
@@ -42,8 +182,7 @@
                 </span>
               </div>
 
-              <!-- Equipos y marcador -->
-   <div class="equipos-row">
+              <div class="equipos-row">
                 <div class="equipo equipo-local">
                   <div class="bandera-wrap">
                     @if (isRealTeam(p.equipo_local)) {
@@ -75,17 +214,14 @@
                 </div>
               </div>
 
-              <!-- Info del partido -->
               <div class="partido-meta">
                 <span>🏟️ {{ p.estadio }}</span>
                 <span>📅 {{ formatFecha(p.date_dt) }}</span>
               </div>
 
-              <!-- Zona de apuesta (solo usuarios logueados) -->
               @if (auth.usuario()) {
                 <div class="apuesta-zone">
 
-                  <!-- Partido finalizado con puntos -->
                   @if (p.apuesta && p.apuesta.puntos_obtenidos !== null && p.apuesta.puntos_obtenidos !== undefined) {
                     <div class="apuesta-result">
                       <span class="apuesta-label">
@@ -97,7 +233,6 @@
                     </div>
                   }
 
-                  <!-- Partido bloqueado con apuesta guardada (sin resolver) -->
                   @else if (p.bloqueado && p.apuesta) {
                     <div class="apuesta-result">
                       <span class="apuesta-label">
@@ -107,12 +242,10 @@
                     </div>
                   }
 
-                  <!-- Partido bloqueado sin apuesta -->
                   @else if (p.bloqueado && !p.apuesta) {
                     <p class="sin-apuesta">No realizaste apuesta para este partido</p>
                   }
 
-                  <!-- Partido abierto — formulario de apuesta -->
                   @else if (!p.bloqueado) {
                     <div class="apuesta-form">
                       <div class="score-inputs">
@@ -152,7 +285,7 @@
     @if (keys().length === 0) {
       <div class="empty-state">
         <span class="empty-icon">📭</span>
-        <p>No hay partidos disponibles en esta fase todavía.</p>
+        <p>No se encontraron partidos que coincidan con la búsqueda.</p>
       </div>
     }
   }

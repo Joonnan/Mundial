@@ -28,13 +28,20 @@ interface PartidoVM extends Partido {
   templateUrl: './partidos.component.html',
   styleUrl: './partidos.component.scss'
 })
+
+
 export class PartidosComponent implements OnInit {
-  private svc  = inject(PartidosService);
+private svc  = inject(PartidosService);
   auth         = inject(AuthService);
 
-  loading = signal(true);
+loading = signal(true);
   tab     = signal<TabType>('grupos');
   partidos= signal<PartidoVM[]>([]);
+
+  // 1. MODIFICADO: Signals de Filtros
+  searchQuery   = signal<string>('');   // Guarda el texto de búsqueda
+  selectedGrupo = signal<string>('');   // NUEVO: Guarda el grupo seleccionado en el combo
+  nombreFase    = NOMBRE_FASE;          // Expuesto para usarlo en el HTML mini-card
 
   // Grupos únicos para fase de grupos
   grupos = computed(() =>
@@ -54,12 +61,50 @@ export class PartidosComponent implements OnInit {
     )]
   );
 
-  // Partidos filtrados por tab activo
+  // 2. MODIFICADO: Filtrado acumulativo reactivo (Combo + Buscador)
+  partidosFiltrados = computed(() => {
+    let list = this.partidos();
+
+    // Filtro 1: Por Grupo (Combo)
+    const grupoSeleccionado = this.selectedGrupo();
+    if (grupoSeleccionado) {
+      list = list.filter(p => p.grupo === grupoSeleccionado);
+    }
+
+    // Filtro 2: Por Texto (Buscador)
+    const query = this.searchQuery().toLowerCase().trim();
+    if (query) {
+      list = list.filter(p => 
+        p.equipo_local.toLowerCase().includes(query) ||
+        p.equipo_visitante.toLowerCase().includes(query) ||
+        (p.grupo && p.grupo.toLowerCase().includes(query)) ||
+        (p.grupo && `grupo ${p.grupo.toLowerCase()}`.includes(query))
+      );
+    }
+
+    return list;
+  });
+
+  // 3. NUEVO: Carrusel con los próximos 6 partidos cronológicamente (que no hayan terminado)
+  proximosPartidos = computed(() => {
+    const ahora = new Date();
+    return this.partidos()
+      .filter(p => p.estado !== 'finalizado' && new Date(p.date_dt) >= ahora)
+      .sort((a, b) => new Date(a.date_dt).getTime() - new Date(b.date_dt).getTime())
+      .slice(0, 6); // Trae los siguientes 6 partidos (ajustable a 5 o 10 a tu gusto)
+  });
+
+  // 4. ACTUALIZADO: Ahora consumen 'partidosFiltrados()' en lugar de 'partidos()'
   partidosPorGrupo = computed(() => {
     if (this.tab() !== 'grupos') return {};
     const map: Record<string, PartidoVM[]> = {};
+    const filtrados = this.partidosFiltrados();
+    
     for (const g of this.grupos()) {
-      map[`Grupo ${g}`] = this.partidos().filter(p => p.grupo === g);
+      const partidosDelGrupo = filtrados.filter(p => p.grupo === g);
+      if (partidosDelGrupo.length > 0) { // Solo muestra el grupo si tiene partidos que coincidan
+        map[`Grupo ${g}`] = partidosDelGrupo;
+      }
     }
     return map;
   });
@@ -67,8 +112,13 @@ export class PartidosComponent implements OnInit {
   partidosPorFase = computed(() => {
     if (this.tab() !== 'torneo') return {};
     const map: Record<string, PartidoVM[]> = {};
+    const filtrados = this.partidosFiltrados();
+
     for (const f of this.fasesTorneo()) {
-      map[NOMBRE_FASE[f]] = this.partidos().filter(p => p.fase === f);
+      const partidosDeLaFase = filtrados.filter(p => p.fase === f);
+      if (partidosDeLaFase.length > 0) { // Solo muestra la fase si contiene coincidencias
+        map[NOMBRE_FASE[f]] = partidosDeLaFase;
+      }
     }
     return map;
   });
@@ -106,8 +156,11 @@ export class PartidosComponent implements OnInit {
     this.loading.set(false);
   }
 
-  setTab(t: TabType) { this.tab.set(t); }
-  
+setTab(t: TabType) { 
+    this.tab.set(t); 
+    this.selectedGrupo.set(''); // Resetea el combo
+    this.searchQuery.set('');   // Resetea el buscador
+  }  
 // Verifica si es una selección real o un texto provisional (ej: Winner match / Repescas)
   isRealTeam(name: string): boolean {
     if (!name) return false;

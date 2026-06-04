@@ -21,6 +21,9 @@
       <a routerLink="/perfil"       routerLinkActive="active" class="nav-btn">
         <span>👤</span> Mi Perfil
       </a>
+      <a routerLink="/premios"      routerLinkActive="active" class="nav-btn">
+        <span>🎁</span> Premios
+      </a>
       @if (auth.isAdmin()) {
         <a routerLink="/admin" routerLinkActive="active" class="nav-btn nav-admin">
           <span>🛠️</span> Admin
@@ -57,6 +60,7 @@
         @if (auth.isAdmin()) {
           <a routerLink="/admin" (click)="menuOpen=false" class="mobile-nav-btn">🛠️ Admin</a>
         }
+        <a routerLink="/premios" (click)="menuOpen=false" class="mobile-nav-btn">🎁 Premios</a>
         <button class="mobile-nav-btn" (click)="auth.signOut()">⏏ Salir</button>
       </div>
     }

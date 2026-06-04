@@ -1,0 +1,220 @@
+// src/app/features/premios/premios.component.scss
+
+// ── 1. Tokens de Paleta y Sistema ───────────────────────────
+$verde:           #0a3d1f; // Verde torneo elegante
+$verde-light:     #16a34a; // Verde vibrante para acentos de éxito
+$verde-muted:     rgba(10, 61, 31, 0.05);
+$oro:             #c8a227; // Dorado trofeo
+$oro-muted:       rgba(200, 162, 39, 0.08);
+$gris-fondo:      #f8fafc; // Fondo limpio estilo Tailwind
+$blanco:          #ffffff; // Fondo de tarjetas puro
+$text-dark:       #0f172a; // Texto principal de alta legibilidad
+$text-muted:      #64748b; // Texto secundario
+$border-color:    #f1f5f9; // Líneas divisorias sutiles
+
+// ── 2. Mixins Utilitarios ───────────────────────────────────
+@mixin soft-shadow {
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.03), 0 8px 16px -6px rgba(15, 23, 42, 0.03);
+}
+
+@mixin transition-smooth {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ── 3. Contenedor Base ──────────────────────────────────────
+.page-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  background: $gris-fondo;
+  min-height: 100vh;
+
+  @media (min-width: 640px) {
+    padding: 2.5rem 2rem;
+  }
+}
+
+// ── 4. Cabecera (Page Header) ───────────────────────────────
+.page-header {
+  margin-bottom: 2rem;
+  
+  h1 {
+    color: $verde;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+
+    @media (min-width: 640px) {
+      font-size: 2.2rem;
+    }
+  }
+
+  p {
+    color: $text-muted;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+}
+
+// ── 5. Grid Auto-Responsivo Inteligente ─────────────────────
+.cards-grid {
+  display: grid;
+  // Si la pantalla baja de 320px (móviles pequeños), se adapta al 100% de forma fluida
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+// ── 6. Tarjeta de Premio (Card UI Premium) ──────────────────
+.premio-card {
+  background: $blanco;
+  border: 1px solid $border-color;
+  border-radius: 1.25rem; // Esquinas redondeadas modernas
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  @include soft-shadow;
+  @include transition-smooth;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba($oro, 0.2);
+    box-shadow: 0 12px 20px -8px rgba(200, 162, 39, 0.12);
+  }
+}
+
+// Parte Superior de la Tarjeta (Icono + Textos)
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+
+  .icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: $oro-muted;
+    border: 1px solid rgba($oro, 0.15);
+    border-radius: 1rem; // Squircle blando
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0; // Evita que el contenedor del emoji se deforme
+    box-shadow: 0 4px 10px rgba($oro, 0.05);
+  }
+
+  h3 {
+    color: $text-dark;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+  }
+
+  p {
+    color: $text-muted;
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+}
+
+// Parte Inferior de la Tarjeta (Formulario / Input)
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    color: $verde;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    height: 48px; // Altura ideal estándar para pulsación táctil (Touch Target)
+    border-radius: 0.75rem;
+    border: 1.5px solid #cbd5e1;
+    background: $gris-fondo;
+    padding: 0 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $text-dark;
+    outline: none;
+    -webkit-appearance: none; // Quita estilos nativos raros de iOS
+    @include transition-smooth;
+
+    &::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    &:focus {
+      background: $blanco;
+      border-color: $verde;
+      box-shadow: 0 0 0 4px rgba(10, 61, 31, 0.08);
+    }
+  }
+}
+
+// ── 7. Zona de Acciones / Botón Guardar ─────────────────────
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  
+  // En móviles el botón ocupa todo el ancho de la pantalla para facilitar el clic
+  width: 100%; 
+}
+
+.btn-save {
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; // Ancho completo en móvil por defecto
+  height: 52px; // Botón principal cómodo para el dedo
+  padding: 0 2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: $blanco;
+  background: $verde;
+  border: none;
+  border-radius: 0.875rem;
+  cursor: pointer;
+  box-shadow: 0 8px 16px -4px rgba(10, 61, 31, 0.25);
+  @include transition-smooth;
+
+  &:hover:not(:disabled) {
+    background: lighten($verde, 4%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px -4px rgba(10, 61, 31, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  // En pantallas de escritorio el botón vuelve a un tamaño contenido muy elegante
+  @media (min-width: 640px) {
+    width: auto;
+    min-width: 280px;
+  }
+}

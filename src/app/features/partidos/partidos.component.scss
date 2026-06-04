@@ -1,114 +1,304 @@
 // src/app/features/partidos/partidos.component.scss
 
-// ── Tab bar ─────────────────────────────────────────────────
+// ── 1. Tokens Locales (Consistencia de colores y temas) ────
+$verde:         #10b981; 
+$verde-dark:    #0a3d1f; // Mapeado con tu variable principal de los otros componentes
+$verde-muted:   rgba(16, 185, 129, 0.08);
+$oro:           #c8a227;
+$gris-borde:    #e5e7eb;
+$text-dark:     #111827;
+$text-muted:    #6b7280;
+$blanco:        #ffffff;
+
+// Fallbacks de sombras por si las variables CSS globales no cargan
+$sombra-sm:     0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+$sombra-md:     0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+
+// ── 2. Contenedor Base ──────────────────────────────────────
+
+
+
+.page-wrap {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1300px;
+  padding: 2rem 1.5rem;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.08), transparent 35%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  color: $text-dark;
+}
+
+// ── 2.5. Hero Section ────────────────────────────────────────
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, $verde 0%, $verde-dark 100%);
+  box-shadow: 
+    0 20px 40px rgba(16, 185, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.hero-glow {
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(200, 162, 39, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(60px);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: $blanco;
+  margin: 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.hero-trophy {
+  display: inline-block;
+  animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes trophy-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+// ── 3. Barra de Navegación por Pestañas (Tabs) ──────────────
 .tab-bar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 2rem;
+  gap: 10px;
+  margin-bottom: 1.75rem;
 }
 
 .tab-btn {
-  padding: 11px 28px;
+  flex: 1; // Hace que en cualquier pantalla se distribuyan equitativamente
+  padding: 12px 16px;
   border-radius: 12px;
-  border: 2px solid var(--verde);
+  border: 2px solid $verde-dark;
   background: transparent;
-  color: var(--verde);
+  color: $verde-dark;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all .2s;
+  white-space: nowrap; // Evita que el texto de la porra se rompa en dos líneas
+  transition: all .2s ease-in-out;
 
-  &:hover:not(.active) { background: var(--verde-muted); }
-  &.active { background: var(--verde); color: #fff; }
+  &:hover:not(.active) { background: $verde-muted; }
+  &.active { background: $verde-dark; color: $blanco; }
 }
 
-// ── Sección de grupo ────────────────────────────────────────
-.group-section { margin-bottom: 3rem; }
+// ── 4. Buscador y Filtros (Responsive Avanzado) ──────────────
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
 
+.search-field,
+.group-select {
+  height: 48px; // Altura ideal para interactuar con el dedo (Touch Target)
+  border-radius: 12px;
+  border: 1.5px solid #d1d5db;
+  background: rgba(255, 255, 255, 0.95);
+  color: $text-dark;
+  box-shadow: $sombra-sm;
+  outline: none;
+  transition: all .2s ease;
+
+  &:focus {
+    border-color: $verde;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    background: $blanco;
+  }
+}
+
+.search-field {
+  flex: 1;
+  padding: 0 16px;
+  min-width: 0; // Previene que inputs en flexboxes rompan el layout
+}
+
+.select-container {
+  flex: 0 0 200px;
+}
+
+.group-select {
+  width: 100%;
+  padding: 0 32px 0 14px; // Espacio extra a la derecha para un icono personalizado si se desea
+  cursor: pointer;
+}
+
+.btn-clear {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0; // Jamás permite que se deforme o estire
+  border: 0;
+  border-radius: 12px;
+  background: $blanco;
+  color: $text-muted;
+  box-shadow: $sombra-sm;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s ease;
+
+  &:hover { background: #f3f4f6; color: $text-dark; transform: translateY(-1px); }
+  &:active { transform: translateY(1px); }
+}
+
+// ── 5. Componentes de Estado ────────────────────────────────
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 3rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: $sombra-sm;
+  text-align: center;
+  color: $text-muted;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid #d1d5db;
+  border-top-color: $verde;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── 6. Secciones y Títulos ──────────────────────────────────
+.upcoming-section, .group-section { margin-bottom: 2.5rem; }
+
+.section-title,
 .group-title {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: var(--verde);
-  margin-bottom: 1rem;
-  border-left: 5px solid var(--oro);
-  padding-left: .65rem;
+  color: $verde-dark;
+  margin-bottom: 1.25rem;
+  border-left: 5px solid $oro;
+  padding-left: .75rem;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-// ── Grid de cards ───────────────────────────────────────────
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: 1rem;
+.section-divider {
+  border: 0;
+  height: 1px;
+  margin: 2rem 0;
+  background: linear-gradient(90deg, transparent, #d1d5db, transparent);
 }
 
-// ── Card partido ────────────────────────────────────────────
-.partido-card {
-  background: #fff;
-  border-radius: var(--radio-lg);
-  border: 1.5px solid var(--gris-borde);
-  box-shadow: var(--sombra-sm);
-  padding: 1.1rem 1.2rem;
-  transition: box-shadow .2s, transform .15s;
+// ── 7. Grid Inteligente de Tarjetas ─────────────────────────
+.cards-grid {
+  display: grid;
+  // auto-fill calcula cuántas tarjetas de min 310px caben en pantalla
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1.25rem;
+}
 
-  &:hover { box-shadow: var(--sombra-md); transform: translateY(-1px); }
+// ── 8. Tarjeta de Partido (Card UI) ─────────────────────────
+.partido-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 16px;
+  border: 1.5px solid $gris-borde;
+  box-shadow: $sombra-sm;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow .2s ease, transform .15s ease;
+
+  &:hover { box-shadow: $sombra-md; transform: translateY(-2px); }
 
   &.card-bloqueado {
     background: #f9fafb;
-    border-color: #d1d5db;
-    &:hover { transform: none; box-shadow: var(--sombra-sm); }
+    border-color: #e5e7eb;
+    &:hover { transform: none; box-shadow: $sombra-sm; }
   }
 
   &.card-finalizado {
     background: #f0fdf4;
-    border-color: #86efac;
+    border-color: #a7f3d0;
   }
 }
 
-// ── Header ──────────────────────────────────────────────────
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 1rem;
 }
 
 .match-num {
-  font-size: 12px;
-  color: #9ca3af;
-  font-weight: 600;
+  font-size: 11px;
+  color: $text-muted;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
-// ── Equipos ─────────────────────────────────────────────────
+// ── 9. Fila de Equipos y Banderas ────────────────────────────
 .equipos-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  gap: 8px;
 }
 
 .equipo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex: 1;
 
-  &.equipo-visitante { align-items: flex-end; }
-  &.equipo-local     { align-items: flex-start; }
+  &.equipo-local     { align-items: flex-start; text-align: left; }
+  &.equipo-visitante { align-items: flex-end; text-align: right; }
 }
 
 .bandera-wrap {
-  width: 54px;
-  height: 36px;
+  width: 56px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   background: #f3f4f6;
   border: 1px solid #e5e7eb;
 }
@@ -116,58 +306,56 @@
 .bandera-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; // Asegura que la bandera llene el contenedor sin deformarse
+  object-fit: cover;
 }
 
-.bandera-placeholder {
-  font-size: 18px;
-}
 .equipo-nombre {
-  font-size: 12px;
-  font-weight: 700;
-  color: #111;
-  text-align: center;
-  max-width: 90px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #1f2937;
+  // Eliminado el max-width estricto de 90px para mejor lectura fluida
+  word-break: break-word; 
 }
 
 .marcador-central {
-  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 70px;
+  min-width: 80px;
 }
 
 .marcador-real {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 900;
-  color: var(--verde);
+  color: $verde-dark;
   letter-spacing: 2px;
 }
 
 .vs-text {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: #9ca3af;
+  text-transform: uppercase;
 }
 
-// ── Meta ────────────────────────────────────────────────────
+// Meta Info
 .partido-meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   font-size: 11px;
-  color: #9ca3af;
-  margin-bottom: 12px;
+  color: $text-muted;
+  margin-bottom: 1rem;
   padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-// ── Zona apuesta ────────────────────────────────────────────
+// ── 10. Zona de Apuestas e Inputs ────────────────────────────
 .apuesta-zone {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: auto; // Empuja la zona de apuesta al fondo si las cards varían de altura
 }
 
 .apuesta-result {
@@ -178,15 +366,16 @@
 
   .apuesta-label {
     font-size: 13px;
-    color: #374151;
-    strong { font-weight: 800; }
+    color: #4b5563;
+    strong { font-weight: 800; color: $text-dark; }
   }
 }
 
 .apuesta-form {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
 }
 
 .score-inputs {
@@ -197,57 +386,101 @@
 }
 
 .score-input {
-  width: 52px;
-  height: 44px;
+  width: 54px;
+  height: 46px; // Excelente tamaño para manipulación táctil
   text-align: center;
   border-radius: 10px;
-  border: 2px solid var(--verde);
+  border: 2px solid $verde-dark;
   font-size: 20px;
   font-weight: 900;
-  color: var(--verde);
+  color: $verde-dark;
   outline: none;
-  background: #fff;
-  transition: border .2s, background .2s;
+  background: rgba(255, 255, 255, 0.98);
+  transition: all .2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
 
-  &:focus { background: var(--verde-muted); }
-
-  /* Oculta flechas del number input */
+  &:focus { background: $verde-muted; border-color: $verde; }
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  &[type=number] { -moz-appearance: textfield; }
 }
 
 .score-sep {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
-  color: #374151;
+  color: $text-muted;
 }
 
 .btn-apostar {
   flex: 1;
-  padding: 10px 8px;
+  padding: 10px 12px;
   font-size: 13px;
+  font-weight: 700;
+  min-height: 46px;
 }
 
+// Mensajes y Chips
 .apuesta-msg {
   font-size: 12px;
   font-weight: 600;
   color: #dc2626;
   margin: 0;
-
   &.ok { color: #16a34a; }
 }
 
 .sin-apuesta {
   font-size: 12px;
-  color: #9ca3af;
+  color: $text-muted;
   font-style: italic;
   margin: 0;
 }
 
-// ── Responsive ──────────────────────────────────────────────
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.badge-pendiente { background: #dbeafe; color: #1d4ed8; }
+.badge-bloqueado { background: #fee2e2; color: #b91c1c; }
+.badge-finalizado { background: #dcfce7; color: #166534; }
+
+.pts-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.pts-pending { background: #fef3c7; color: #92400e; }
+
+// ── 11. Media Queries específicas de ajuste fino para Móvil ──
 @media (max-width: 600px) {
-  .tab-bar { flex-direction: column; }
-  .tab-btn { text-align: center; }
-  .cards-grid { grid-template-columns: 1fr; }
+  .page-wrap { padding: 1rem; }
+  
+  // Reorganización de la barra de búsqueda para que no colapse feo
+  .search-bar-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  // Buscador y botón limpiar en la misma línea
+  .search-field {
+    flex: 1;
+  }
+  
+  // El contenedor del selector de grupos toma el 100% abajo del buscador
+  .select-container {
+    flex: 1 1 100%;
+  }
+
+  // Corregido: .btn-clear ya NO mide 100%. Se mantiene compacto al lado del input buscador
+  // Para lograr esto en el HTML, podrías envolver el input y el btn-clear en un div, 
+  // o con este CSS se adaptará al estiramiento flex natural si mantienes el orden.
+  
+  .equipo-nombre {
+    font-size: 12px; // Un punto menos de tamaño para pantallas extremadamente angostas
+  }
 }
