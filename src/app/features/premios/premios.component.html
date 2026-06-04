@@ -11,30 +11,37 @@
 
     @for (premio of premios(); track premio.id) {
 
-      <div class="premio-card">
+  <div class="premio-card" [class.disabled-card]="bloqueado()">
 
-        <div class="card-top">
-          <div class="icon">
-            {{ premio.icono }}
-          </div>
+    <div class="card-top">
+      <div class="icon">
+        {{ premio.icono }}
+      </div>
 
-          <div>
-            <h3>{{ premio.titulo }}</h3>
-            <p>{{ premio.descripcion }}</p>
-          </div>
-        </div>
+      <div>
+        <h3>{{ premio.titulo }}</h3>
+        <p>{{ premio.descripcion }}</p>
+      </div>
+
+      <div class="puntos-chip">
+        🏆 {{ premio.puntos }} pts
+      </div>
+    </div>
+
+    <div class="card-body">
+      </div>
 
         <div class="card-body">
-
-          <label>
+          <label for="input-{{premio.id}}">
             Tu elección
           </label>
 
           <input
+            id="input-{{premio.id}}"
             type="text"
             [(ngModel)]="premio.valor"
-            placeholder="Escribe tu predicción..." />
-
+            [disabled]="bloqueado()"
+            placeholder="{{ bloqueado() ? 'Predicciones cerradas' : 'Escribe tu predicción...' }}" />
         </div>
 
       </div>
@@ -44,16 +51,18 @@
   </div>
 
   <div class="actions">
-
     <button
       class="btn-save"
-      [disabled]="guardando()"
+      [disabled]="guardando() || bloqueado()"
       (click)="guardar()">
 
-      {{ guardando() ? 'Guardando...' : '💾 Guardar Predicciones' }}
+      @if (bloqueado()) {
+        🔒 Predicciones Cerradas
+      } @else {
+        {{ guardando() ? 'Guardando...' : '💾 Guardar / Actualizar' }}
+      }
 
     </button>
-
   </div>
 
 </div>

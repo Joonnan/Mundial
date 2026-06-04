@@ -217,4 +217,23 @@ $border-color:    #f1f5f9; // Líneas divisorias sutiles
     width: auto;
     min-width: 280px;
   }
+}.puntos-chip {
+  background-color: #f39c12;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-left: auto; /* Empuja el chip a la derecha si usas flexbox */
 }
+
+.disabled-card {
+  opacity: 0.8;
+  background-color: #f9f9f9;
+  
+  input {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+  }
+}
+
