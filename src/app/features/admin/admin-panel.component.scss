@@ -1,221 +1,485 @@
 // src/app/features/admin/admin-panel.component.scss
 
-// ── Header ──────────────────────────────────────────────────
-.admin-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 1.75rem;
+// ── 1. Tokens de Paleta y Sistema ───────────────────────────
+$verde:           #0a3d1f; // Verde torneo elegante
+$verde-light:     #16a34a; // Verde vibrante para éxitos
+$verde-muted:     rgba(10, 61, 31, 0.04);
+$oro:             #c8a227; // Dorado oficial
+$oro-light:       #eab308;
+$oro-muted:       rgba(200, 162, 39, 0.06);
+$gris-fondo:      #f8fafc; // Fondo general limpio
+$blanco:          #ffffff; // Fondo de tarjetas puro
+$text-dark:       #0f172a; // Texto principal de alta legibilidad
+$text-muted:      #64748b; // Texto secundario suave
+$border-color:    #f1f5f9; // Bordes sutiles
 
-  .admin-title { font-size: 1.75rem; font-weight: 900; color: var(--verde); margin: 0; }
-  .admin-sub   { color: var(--gris-texto); margin: 4px 0 0; font-size: 14px; }
+// ── 2. Mixins Utilitarios ───────────────────────────────────
+@mixin soft-shadow {
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.03), 0 8px 16px -6px rgba(15, 23, 42, 0.03);
 }
 
-// ── Stats ───────────────────────────────────────────────────
+@mixin transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ── 3. Contenedor Base ──────────────────────────────────────
+.page-wrap {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  background: $gris-fondo;
+  min-height: 100vh;
+
+  @media (min-width: 640px) {
+    padding: 2.5rem 2rem;
+  }
+}
+
+// ── 4. Cabecera del Panel ───────────────────────────────────
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  .admin-title { 
+    font-size: 1.6rem; 
+    font-weight: 900; 
+    color: $verde; 
+    margin: 0;
+    letter-spacing: -0.02em;
+
+    @media (min-width: 640px) { font-size: 2.2rem; }
+  }
+  
+  .admin-sub { 
+    color: $text-muted; 
+    margin: 0.25rem 0 0 0; 
+    font-size: 0.9rem; 
+    font-weight: 500;
+  }
+}
+
+// ── 5. Rejilla de Estadísticas (Dashboard Grid) ─────────────
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 1.75rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .stat-card {
-  background: #fff;
-  border-radius: var(--radio-lg);
-  border: 1.5px solid var(--gris-borde);
+  background: $blanco;
+  border-radius: 1rem;
+  border: 1px solid $border-color;
   padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 14px;
-  box-shadow: var(--sombra-sm);
+  gap: 1rem;
+  @include soft-shadow;
 
-  &.stat-fin  { border-color: #86efac; background: #f0fdf4; }
-  &.stat-pend { border-color: #fde68a; background: #fefce8; }
+  &.stat-fin  { border-color: rgba($verde-light, 0.2); background: rgba($verde-light, 0.02); }
+  &.stat-pend { border-color: rgba($oro, 0.2); background: $oro-muted; }
 
-  .stat-icon { font-size: 30px; flex-shrink: 0; }
+  .stat-icon { font-size: 1.75rem; flex-shrink: 0; }
 }
 
 .stat-body {
-  .stat-label { font-size: 11px; color: var(--gris-texto); font-weight: 600; margin: 0; text-transform: uppercase; letter-spacing: .5px; }
-  .stat-value { font-size: 28px; font-weight: 900; color: var(--verde); margin: 2px 0 0; }
+  .stat-label { 
+    font-size: 0.7rem; 
+    color: $text-muted; 
+    font-weight: 700; 
+    margin: 0; 
+    text-transform: uppercase; 
+    letter-spacing: .05em; 
+  }
+  .stat-value { 
+    font-size: 1.5rem; 
+    font-weight: 900; 
+    color: $text-dark; 
+    margin: 0.1rem 0 0 0; 
+    line-height: 1.1;
+  }
 }
 
-.text-green { color: #16a34a !important; }
-.text-gold  { color: var(--oro) !important; }
+.text-green { color: darken($verde-light, 5%) !important; }
+.text-gold  { color: darken($oro-light, 10%) !important; }
 
-// ── Filtros ─────────────────────────────────────────────────
+// ── 6. Barra de Filtros y Búsqueda ──────────────────────────
 .filtros-bar {
   display: flex;
-  gap: 12px;
+  gap: 1rem;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
+.bandera-dinamica {
+  width: 28px;
+  height: 20px;
+  object-fit: cover; // Evita que la bandera se deforme
+  border-radius: 4px; // Esquinas suavizadas elegantes
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); // Pequeño relieve visual
+  flex-shrink: 0; // Impide que la imagen se achique en pantallas móviles
+}
+.bandera-dinamica {
+  width: 28px;
+  height: 20px;
+  object-fit: cover; /* Centra e iguala cualquier bandera o proporción de imagen */
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
 
-.filtro-search {
+.search-wrapper {
+  position: relative;
   flex: 1;
-  min-width: 240px;
+  min-width: 260px;
+
+  .filtro-search {
+    width: 100%;
+    height: 44px;
+    border-radius: 0.75rem;
+    border: 1.5px solid #cbd5e1;
+    padding: 0 2.5rem 0 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: $text-dark;
+    outline: none;
+    @include transition-smooth;
+
+    &:focus {
+      border-color: $verde;
+      box-shadow: 0 0 0 4px rgba(10, 61, 31, 0.08);
+      background: $blanco;
+    }
+  }
+
+  .clear-search {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e2e8f0;
+    border: none;
+    color: $text-muted;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    &:hover { background: #cbd5e1; color: $text-dark; }
+  }
 }
 
 .filtro-tabs {
   display: flex;
-  border-radius: 10px;
+  border-radius: 0.75rem;
   overflow: hidden;
-  border: 1.5px solid var(--gris-borde);
-  background: #fff;
-  flex-shrink: 0;
+  border: 1.5px solid #cbd5e1;
+  background: $blanco;
+  width: 100%;
+
+  @media (min-width: 640px) { width: auto; }
 }
 
 .ftab {
-  padding: 9px 16px;
+  flex: 1;
+  padding: 0.7rem 1.25rem;
   border: none;
   background: transparent;
-  color: var(--gris-texto);
-  font-weight: 600;
-  font-size: 13px;
+  color: $text-muted;
+  font-weight: 700;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: all .15s;
-  font-family: inherit;
+  @include transition-smooth;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
 
-  &.active { background: var(--verde); color: #fff; }
-  &:not(.active):hover { background: #f3f4f6; color: #374151; }
+  &.active { 
+    background: $verde; 
+    color: $blanco; 
+  }
+  &:not(.active):hover { background: #f1f5f9; color: $text-dark; }
+
+  .badge-count {
+    background: #e2e8f0;
+    color: $text-dark;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+  &.active .badge-count {
+    background: rgba($blanco, 0.2);
+    color: $blanco;
+  }
 }
 
-// ── Secciones ───────────────────────────────────────────────
+// ── 7. Secciones de Fases y Tabla de Datos ──────────────────
 .fase-section { margin-bottom: 2.5rem; }
 
 .fase-title {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: var(--verde);
-  margin-bottom: .75rem;
-  border-left: 4px solid var(--oro);
-  padding-left: .6rem;
+  color: $verde;
+  margin-bottom: 1rem;
+  border-left: 4px solid $oro;
+  padding-left: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
-// ── Filas ───────────────────────────────────────────────────
-.row-finalizado { background: #f9fffe; }
-.row-editando   { background: #fffbeb; }
-
-.num-cell     { font-size: 12px; color: #9ca3af; font-weight: 700; }
-.fecha-cell   { font-size: 12px; color: var(--gris-texto); white-space: nowrap; }
-.estadio-cell { font-size: 12px; color: #9ca3af; }
-
-.partido-cell {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-
-  .bandera-sm { font-size: 18px; flex-shrink: 0; }
-  .equipo-sm  { white-space: nowrap; max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
-  .vs-sm      { color: #9ca3af; font-weight: 400; font-size: 11px; }
+.table-wrap {
+  background: $blanco;
+  border-radius: 1.25rem;
+  border: 1px solid $border-color;
+  overflow: hidden;
+  @include soft-shadow;
+  // Permite scroll lateral suave si la pantalla es extremadamente pequeña
+  overflow-x: auto; 
 }
 
-.marcador-cell {
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--verde);
-  letter-spacing: 1px;
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.95rem;
+
+  th {
+    background: #f8fafc;
+    color: $text-muted;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
+    vertical-align: middle;
+    @include transition-smooth;
+  }
+
+  tbody tr {
+    &:hover { background: #fbfdfe; }
+    
+    &.row-finalizado { 
+      background: rgba($verde-muted, 0.3);
+      &:hover { background: rgba($verde-muted, 0.5); }
+    }
+    
+    &.row-saving { 
+      opacity: 0.6;
+      pointer-events: none;
+      background: #fafafa;
+    }
+  }
 }
 
-.sin-marcador { color: #d1d5db; font-size: 18px; }
-
-.accion-btns {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.editando-label {
-  font-size: 12px;
-  color: var(--oro);
-  font-weight: 700;
-}
-
-// ── Fila de edición ─────────────────────────────────────────
-.edit-row td { background: #fffbeb; border-top: 2px solid var(--oro); }
-
-.edit-form {
+// Celdas de información secundaria
+.num-cell { font-size: 0.85rem; color: #94a3b8; font-weight: 700; }
+.info-cell {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 6px 4px;
+  gap: 0.25rem;
+  
+  .fecha-cell { font-size: 0.85rem; color: $text-dark; font-weight: 600; white-space: nowrap; }
+  .estadio-cell { font-size: 0.75rem; color: $text-muted; font-weight: 400; }
 }
 
-.edit-equipos {
+// ── 8. Marcador Directo y Equipos (¡CORREGIDO!) ─────────────
+.partido-marcador-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  min-width: 320px;
 }
 
-.edit-equipo {
-  font-size: 15px;
-  font-weight: 700;
-  color: #374151;
-  white-space: nowrap;
-}
-
-.edit-inputs {
+.equipo-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 750;
+  color: $text-dark;
+
+  &.local { justify-content: flex-end; text-align: right; }
+  &.visitante { justify-content: flex-start; text-align: left; }
+
+  .bandera-dinamica { font-size: 1.5rem; line-height: 1; }
+  .equipo-name { white-space: nowrap; }
 }
 
-.score-input-admin {
-  width: 64px;
-  height: 52px;
+.inputs-marcador-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.75rem;
+}
+
+.score-live-input {
+  width: 44px;
+  height: 40px;
   text-align: center;
-  border-radius: 12px;
-  border: 2.5px solid var(--verde);
-  font-size: 26px;
+  border-radius: 0.5rem;
+  border: 1.5px solid #cbd5e1;
+  font-size: 1.25rem;
   font-weight: 900;
-  color: var(--verde);
+  color: $verde;
   outline: none;
-  background: #fff;
-  transition: background .15s;
+  background: $blanco;
+  @include transition-smooth;
 
-  &:focus { background: var(--verde-muted); }
+  &:focus:not(:disabled) { 
+    border-color: $verde; 
+    box-shadow: 0 0 0 3px rgba(10, 61, 31, 0.1); 
+  }
+
+  &:disabled {
+    background: transparent;
+    border-color: transparent;
+    color: $text-dark;
+    cursor: not-allowed;
+    -webkit-text-fill-color: $text-dark; // Fix para Safari iOS
+  }
+
+  // Ocultar flechas nativas de números
   &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button { -webkit-appearance: none; }
+  &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   &[type=number] { -moz-appearance: textfield; }
 }
 
-.edit-guion {
-  font-size: 26px;
+.separador-marcador {
+  font-size: 1.1rem;
   font-weight: 800;
-  color: #374151;
+  color: $text-muted;
 }
 
-.edit-actions {
+// ── 9. Badges de Estado ─────────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+
+  &.badge-finalizado { background: #dcfce7; color: darken($verde-light, 10%); }
+  &.badge-pendiente { background: #fefce8; color: darken($oro-light, 15%); }
+}
+
+// ── 10. Botones de Acción Utilitarios ───────────────────────
+.accion-btns {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  &.j-end { justify-content: flex-end; }
 }
 
-.edit-hint {
-  font-size: 12px;
-  color: #6b7280;
-  font-style: italic;
-  margin: 0;
-  max-width: 700px;
-  line-height: 1.5;
+.btn {
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  @include transition-smooth;
+  border-radius: 0.5rem;
+  border: none;
+  height: 34px;
+  padding: 0 1rem;
+  font-size: 0.8rem;
 
-  strong { font-style: normal; color: var(--verde); }
+  &.btn-primary {
+    background: $verde; 
+    color: $blanco;
+    box-shadow: 0 4px 10px rgba(10, 61, 31, 0.12);
+    &:hover:not(:disabled) { background: lighten($verde, 5%); }
+    &:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+  }
+
+  &.btn-ghost {
+    background: transparent;
+    color: $text-muted;
+    border: 1px solid #cbd5e1;
+    &:hover:not(:disabled) { background: #f1f5f9; color: $text-dark; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &.btn-sm { height: 32px; padding: 0 0.75rem; }
 }
 
-// ── Responsive ──────────────────────────────────────────────
-@media (max-width: 900px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+// ── 11. Componentes del Sistema (Alerts, Loaders, Empty) ────
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+
+  &.alert-success { background: #dcfce7; color: darken($verde-light, 10%); border: 1px solid rgba($verde-light, 0.2); }
+  &.alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid rgba(#b91c1c, 0.1); }
 }
 
-@media (max-width: 600px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .hide-md    { display: none; }
-  .admin-header { flex-direction: column; align-items: flex-start; }
-  .edit-equipos { flex-direction: column; align-items: flex-start; gap: 10px; }
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  color: $text-muted;
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e2e8f0;
+    border-top-color: $verde;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: $blanco;
+  border-radius: 1.25rem;
+  border: 1px dashed #cbd5e1;
+  color: $text-muted;
+
+  .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+  p { margin: 0; font-weight: 500; font-size: 0.95rem; }
+}
+
+// Animaciones Nativas
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+// ── 12. Responsive Ocultamientos Rápidos ────────────────────
+@media (max-width: 768px) {
+  .hide-md { display: none !important; }
 }

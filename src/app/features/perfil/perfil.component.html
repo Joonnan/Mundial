@@ -98,9 +98,10 @@
                 <div class="historial-item">
                   <div class="hist-partido">
                     <span class="hist-equipos">
-                      {{ bandera(a.partido?.equipo_local ?? '') }} {{ a.partido?.equipo_local }}
-                      <span class="hist-sep">vs</span>
-                      {{ a.partido?.equipo_visitante }} {{ bandera(a.partido?.equipo_visitante ?? '') }}
+                      <img [src]="bandera(a.partido?.equipo_local ?? '')" alt="Bandera" class="flag-icon" />
+                      {{ a.partido?.equipo_local }} 
+                      <span class="hist-sep">vs</span> <br/>
+                     <img [src]="bandera(a.partido?.equipo_visitante ?? '')" alt="Bandera" class="flag-icon" /> {{ a.partido?.equipo_visitante }} 
                     </span>
                     <span class="hist-fecha">{{ formatFecha(a.partido?.date_dt ?? a.created_at) }}</span>
                   </div>

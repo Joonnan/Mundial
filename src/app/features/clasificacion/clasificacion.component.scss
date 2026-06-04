@@ -264,8 +264,7 @@ $podio-3nd-start:  #fcd34d; $podio-3nd-end:  #d97706;
 // ── 8. Fase de Grupos (Mundial Real) ─────────────────────────
 .grupos-grid {
   display: grid;
-  // Mejorado a minminmax inteligente responsivo
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 600px), 1fr));
   gap: 1.25rem;
   padding: 0 1.5rem;
 }
@@ -320,6 +319,55 @@ $podio-3nd-start:  #fcd34d; $podio-3nd-end:  #d97706;
   &.pts-1 { background: #dbeafe; color: #1e40af; }
   &.pts-0 { background: #fee2e2; color: #991b1b; }
 }
+// ── 8.1 Intro y filtros ─────────────────────────────────────
+
+.grupos-intro {
+  margin: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border: 1px solid $borde;
+  border-radius: 14px;
+  color: $text;
+  font-size: .92rem;
+
+  strong {
+    color: $verde;
+  }
+}
+
+.grupo-pills {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin: 0 1.5rem 1.5rem;
+}
+
+.gpill {
+  border: none;
+  background: #fff;
+  border: 1.5px solid $borde;
+  color: $muted;
+  padding: .6rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: .85rem;
+
+  @include transition-smooth;
+
+  &:hover {
+    border-color: $verde-light;
+    color: $verde;
+    transform: translateY(-1px);
+  }
+
+  &.gpill-active {
+    background: $verde;
+    color: #fff;
+    border-color: $verde;
+    box-shadow: 0 4px 12px rgba($verde, .25);
+  }
+}
 
 // ── 9. Media Queries de Ajuste Fino ─────────────────────────
 @media (max-width: 640px) {
@@ -330,4 +378,219 @@ $podio-3nd-start:  #fcd34d; $podio-3nd-end:  #d97706;
   .podio-scene { padding: 1rem 1rem 0; gap: 0.5rem; }
   .hide-sm, .hide-xs { display: none; }
   .team-name { max-width: 80px; }
+}
+
+
+
+.grupo-card {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba($verde, .08);
+
+  overflow: hidden;
+
+  @include card-shadow;
+  @include transition-smooth;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0,0,0,.10);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(
+      180deg,
+      $oro,
+      $verde-light
+    );
+  }
+}
+
+.grupo-header {
+  background: linear-gradient(
+    135deg,
+    $verde 0%,
+    $verde-light 100%
+  );
+
+  padding: .9rem 1rem;
+
+  .grupo-label {
+    font-size: 1rem;
+    letter-spacing: .03em;
+  }
+
+  .grupo-badge {
+    background: rgba(#fff,.18);
+    backdrop-filter: blur(8px);
+  }
+}
+
+.grupo-table {
+
+  tbody tr {
+    @include transition-smooth;
+
+    &:hover {
+      background: #fafafa;
+    }
+  }
+
+  th {
+    white-space: nowrap;
+  }
+
+  td {
+    height: 48px;
+  }
+
+  .eq-clasificado {
+    background: linear-gradient(
+      90deg,
+      rgba(#16a34a,.07),
+      transparent
+    );
+  }
+
+  .eq-eliminado {
+    opacity: .72;
+  }
+}
+
+.pos-dot {
+  width: 26px;
+  height: 26px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.dot-pass {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.dot-out {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.team-cell {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.flag-mini {
+  width: 22px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,.08);
+  flex-shrink: 0;
+}
+
+.flag-emoji {
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-weight: 600;
+  color: $text;
+}
+
+.grupo-leyenda {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+
+  padding: .75rem 1rem;
+
+  border-top: 1px solid #f3f4f6;
+
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+.gl-pass {
+  color: #16a34a;
+}
+
+.gl-out {
+  color: #dc2626;
+}
+
+.grupo-resultados {
+  border-top: 1px solid #f3f4f6;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.gr-title {
+  margin: 0 0 .75rem;
+  font-size: .75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: $muted;
+}
+
+.gr-partido {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  gap: .5rem;
+
+  padding: .65rem .75rem;
+  border-radius: 10px;
+
+  &:not(:last-child) {
+    margin-bottom: .5rem;
+  }
+
+  &.gr-finalizado {
+    background: #fff;
+    border: 1px solid $borde;
+  }
+}
+
+.gr-equipo {
+font-size: .82rem; font-weight: 600; color: $text;
+}
+
+
+.gr-local {
+  text-align: right;
+}
+
+.gr-visitante {
+  text-align: left;
+}
+
+.gr-marcador {
+  min-width: 70px;
+  text-align: center;
+
+  strong {
+    color: $verde;
+    font-size: .95rem;
+  }
+}
+
+.gr-pendiente {
+  color: $muted;
+  font-weight: 700;
 }

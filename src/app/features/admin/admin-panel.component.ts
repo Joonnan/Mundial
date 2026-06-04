@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { PartidosService } from '../../core/services/partidos.service';
-import { Partido, NOMBRE_FASE, bandera } from '../../core/models';
+import { Partido, NOMBRE_FASE } from '../../core/models'; // Quitamos bandera del import de models si lo manejamos aquí
 
 interface PartidoAdmin extends Partido {
   draftLocal: string;
@@ -94,15 +94,79 @@ export class AdminPanelComponent implements OnInit {
     }
   }
 
-  bandera = bandera;
+  bandera(equipo: string): string {
+  if (!equipo) return 'https://flagcdn.com/w40/un.png';
+  
+  const clean = equipo.toLowerCase().trim();
+  
+  // Mapeo exhaustivo extraído directamente de tu archivo CSV
+  const codigosISO: Record<string, string> = {
+    // ── PAÍSES REALES ─────────────────────────────────
+    'algeria': 'dz',
+    'argentina': 'ar',
+    'australia': 'au',
+    'austria': 'at',
+    'belgium': 'be',
+    'brazil': 'br',
+    'cabo verde': 'cv',
+    'canada': 'ca',
+    'colombia': 'co',
+    'croatia': 'hr',
+    'curaçao': 'cw',
+    "côte d'ivoire": 'ci',
+    'ecuador': 'ec',           // ¡Añadido!
+    'egypt': 'eg',
+    'england': 'gb-eng',
+    'france': 'fr',
+    'germany': 'de',
+    'ghana': 'gh',
+    'haiti': 'ht',
+    'ir iran': 'ir',
+    'japan': 'jp',
+    'jordan': 'jo',
+    'korea republic': 'kr',
+    'mexico': 'mx',
+    'morocco': 'ma',
+    'netherlands': 'nl',
+    'new zealand': 'nz',
+    'norway': 'no',
+    'panama': 'pa',
+    'paraguay': 'py',
+    'portugal': 'pt',
+    'qatar': 'qa',
+    'saudi arabia': 'sa',
+    'scotland': 'gb-sct',
+    'senegal': 'sn',
+    'south africa': 'za',
+    'spain': 'es',
+    'switzerland': 'ch',
+    'tunisia': 'tn',
+    'usa': 'us',
+    'uruguay': 'uy',
+    'uzbekistan': 'uz'
+  };
 
+  // 1. Si es un país real mapeado, devolvemos su bandera oficial
+  if (codigosISO[clean]) {
+    return `https://flagcdn.com/w40/${codigosISO[clean]}.png`;
+  }
+
+  // 2. Control especial para Play-offs/Repechajes (ej: "Albania/Poland/Sweden/Ukraine")
+  // Si contiene una barra oblicua "/", mostramos un icono global neutral de torneo
+  if (clean.includes('/')) {
+    return 'https://flagcdn.com/w40/un.png'; // Globo terráqueo azul (Naciones Unidas)
+  }
+
+  // 3. Control para textos de eliminatorias futuras (ej: "Winner match 73" o "Group A winners")
+  // Devolvemos el mismo icono global de la FIFA/Torneo para que la interfaz quede impecable
+  return 'https://flagcdn.com/w40/un.png';
+}
   formatFecha(dt: string): string {
     return new Date(dt).toLocaleString('es-ES', {
       day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
     });
   }
 
-  // ── Guardar Marcador Directo ───────────────────────────────────────────
   async guardarMarcador(p: PartidoAdmin) {
     const gl = parseInt(p.draftLocal, 10);
     const gv = parseInt(p.draftVisitante, 10);
@@ -120,19 +184,16 @@ export class AdminPanelComponent implements OnInit {
       this.updatePartidoState(p.match_number, { saving: false });
     } else {
       this.showGlobalMsg(`✓ Partido #${p.match_number} guardado. Puntos recalculados en DB.`, true);
-      // Actualizamos localmente el estado sin necesidad de refrescar todo el HTTP si el backend responde OK
       this.updatePartidoState(p.match_number, { 
         saving: false, 
         estado: 'finalizado',
         goles_local: gl,
         goles_visitante: gv 
       });
-      // Descomenta la siguiente línea si necesitas recargar obligatoriamente los datos actualizados por BD:
       await this.loadPartidos();
     }
   }
 
-  // ── Reabrir Partido para Edición ───────────────────────────────────────────
   async reabrir(p: PartidoAdmin) {
     const seguro = confirm(`¿Reabrir partido #${p.match_number}? Se anularán temporalmente los puntos asignados.`);
     if (!seguro) return;

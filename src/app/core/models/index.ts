@@ -63,18 +63,69 @@ export const NOMBRE_FASE: Record<Fase, string> = {
   final:         'Gran Final',
 };
 
-export const BANDERAS: Record<string, string> = {
-  'México': '🇲🇽', 'Canadá': '🇨🇦', 'Argentina': '🇦🇷',
-  'Brasil': '🇧🇷', 'España': '🇪🇸', 'Francia': '🇫🇷',
-  'Alemania': '🇩🇪', 'Portugal': '🇵🇹', 'Inglaterra': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  'Países Bajos': '🇳🇱', 'Croacia': '🇭🇷', 'Bélgica': '🇧🇪',
-  'Uruguay': '🇺🇾', 'Japón': '🇯🇵', 'Marruecos': '🇲🇦',
-  'Islandia': '🇮🇸', 'Ecuador': '🇪🇨', 'Arabia Saudí': '🇸🇦',
-  'Irán': '🇮🇷', 'Serbia': '🇷🇸',
+export const BANDERAS: Record<string, string> = {    // ── PAÍSES REALES ─────────────────────────────────
+    'algeria': 'dz',
+    'argentina': 'ar',
+    'australia': 'au',
+    'austria': 'at',
+    'belgium': 'be',
+    'brazil': 'br',
+    'cabo verde': 'cv',
+    'canada': 'ca',
+    'colombia': 'co',
+    'croatia': 'hr',
+    'curaçao': 'cw',
+    "côte d'ivoire": 'ci',
+    'ecuador': 'ec',           // ¡Añadido!
+    'egypt': 'eg',
+    'england': 'gb-eng',
+    'france': 'fr',
+    'germany': 'de',
+    'ghana': 'gh',
+    'haiti': 'ht',
+    'ir iran': 'ir',
+    'japan': 'jp',
+    'jordan': 'jo',
+    'korea republic': 'kr',
+    'mexico': 'mx',
+    'morocco': 'ma',
+    'netherlands': 'nl',
+    'new zealand': 'nz',
+    'norway': 'no',
+    'panama': 'pa',
+    'paraguay': 'py',
+    'portugal': 'pt',
+    'qatar': 'qa',
+    'saudi arabia': 'sa',
+    'scotland': 'gb-sct',
+    'senegal': 'sn',
+    'south africa': 'za',
+    'spain': 'es',
+    'switzerland': 'ch',
+    'tunisia': 'tn',
+    'usa': 'us',
+    'uruguay': 'uy',
+    'uzbekistan': 'uz'
 };
 
-export function bandera(equipo: string): string {
-  return BANDERAS[equipo] ?? '🏳️';
+export function bandera(equipo: string | null | undefined): string {
+  if (!equipo) return 'https://flagcdn.com/w40/un.png';
+  
+  const clean = equipo.toLowerCase().trim();
+
+  // 1. Si es un país real mapeado, devolvemos su bandera oficial de FlagCDN
+  if (BANDERAS[clean]) {
+    return `https://flagcdn.com/w40/${BANDERAS[clean]}.png`;
+  }
+
+  // 2. Control especial para Play-offs/Repechajes (ej: "Albania/Poland")
+  // o textos de eliminatorias futuras (ej: "Winner match 73")
+  if (clean.includes('/') || clean.includes('winner') || clean.includes('group')) {
+    return 'https://flagcdn.com/w40/un.png';
+  }
+
+  // 3. Fallback general por si no coincide nada
+  return 'https://flagcdn.com/w40/un.png';
 }
 
 export function partidoBloqueado(partido: Partido): boolean {

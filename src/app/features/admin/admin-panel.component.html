@@ -109,39 +109,39 @@
                     </div>
                   </td>
                   
-                  <td>
-                    <div class="partido-marcador-row">
-                      
-                      <div class="equipo-wrapper local">
-                        <span class="equipo-name">{{ p.equipo_local }}</span>
-                        <span class="bandera-dinamica">{{ bandera(p.equipo_local) }}</span>
-                      </div>
+<td>
+  <div class="partido-marcador-row">
+    
+    <div class="equipo-wrapper local">
+      <span class="equipo-name">{{ p.equipo_local }}</span>
+      <img [src]="bandera(p.equipo_local)" class="bandera-dinamica" alt="" loading="lazy" />
+    </div>
 
-                      <div class="inputs-marcador-wrap">
-                        <input
-                          type="number" min="0" max="99"
-                          class="score-live-input"
-                          [(ngModel)]="p.draftLocal"
-                          [disabled]="p.estado === 'finalizado' || p.saving"
-                          placeholder="-" />
-                        
-                        <span class="separador-marcador">:</span>
-                        
-                        <input
-                          type="number" min="0" max="99"
-                          class="score-live-input"
-                          [(ngModel)]="p.draftVisitante"
-                          [disabled]="p.estado === 'finalizado' || p.saving"
-                          placeholder="-" />
-                      </div>
+    <div class="inputs-marcador-wrap">
+      <input
+        type="number" min="0" max="99"
+        class="score-live-input"
+        [(ngModel)]="p.draftLocal"
+        [disabled]="p.estado === 'finalizado' || p.saving"
+        placeholder="-" />
+      
+      <span class="separador-marcador">:</span>
+      
+      <input
+        type="number" min="0" max="99"
+        class="score-live-input"
+        [(ngModel)]="p.draftVisitante"
+        [disabled]="p.estado === 'finalizado' || p.saving"
+        placeholder="-" />
+    </div>
 
-                      <div class="equipo-wrapper visitante">
-                        <span class="bandera-dinamica">{{ bandera(p.equipo_visitante) }}</span>
-                        <span class="equipo-name">{{ p.equipo_visitante }}</span>
-                      </div>
+    <div class="equipo-wrapper visitante">
+      <img [src]="bandera(p.equipo_visitante)" class="bandera-dinamica" alt="" loading="lazy" />
+      <span class="equipo-name">{{ p.equipo_visitante }}</span>
+    </div>
 
-                    </div>
-                  </td>
+  </div>
+</td>
 
                   <td class="text-center">
                     <span class="badge" [class.badge-finalizado]="p.estado==='finalizado'" [class.badge-pendiente]="p.estado==='pendiente'">
